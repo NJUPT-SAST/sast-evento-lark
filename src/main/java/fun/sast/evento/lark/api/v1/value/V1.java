@@ -10,12 +10,10 @@ public interface V1 {
             String description,
             Date gmtEventStart,
             Date gmtEventEnd,
-            Date gmtRegistrationStart,
-            Date gmtRegistrationEnd,
+            Date gmtRegistrationStart,//报名
+            Date gmtRegistrationEnd,//
             EventType eventType,
-            Integer typeId,
             String location,
-            Integer locationId,
             String tag,
             Integer state,//1:未开始,2:报名中,3:进行中,4:已取消,5:已结束
             List<Department> departments

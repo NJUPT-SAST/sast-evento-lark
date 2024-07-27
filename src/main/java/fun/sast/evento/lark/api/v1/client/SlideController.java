@@ -15,6 +15,7 @@ class SlideController {
 
     @GetMapping("/event/list")
     public List<V1.Slide> event(@RequestParam Integer eventId) {
+
         return List.of();
     }
 
