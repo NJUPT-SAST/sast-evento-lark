@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/vi/slide")
+@RequestMapping("/api/v1/slide")
 class SlideController {
 
 

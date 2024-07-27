@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/vi/feedback")
+@RequestMapping("/api/v1/feedback")
 class FeedbackController {
 
     @GetMapping("/event")
