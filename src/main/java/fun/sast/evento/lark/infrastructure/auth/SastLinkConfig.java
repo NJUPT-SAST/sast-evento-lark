@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-class SastLinkConfiguration {
+class SastLinkConfig {
 
     @Bean
     SastLinkService sastLinkService(@Value("${app.sast-link.client-id}") String id,
