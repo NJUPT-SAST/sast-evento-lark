@@ -1,4 +1,4 @@
-package fun.sast.evento.lark.api.v2.client;
+package fun.sast.evento.lark.api.common;
 
 import fun.sast.evento.lark.api.v2.value.V2;
 import org.springframework.web.bind.annotation.GetMapping;

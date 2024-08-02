@@ -11,8 +11,6 @@ public interface V2 {
             String location,
             String tag,
             String attachmentUrl,
-            Long like,
-            Long dislike,
             String larkEventUid,
             String larkMeetingRoomId,
             String larkMeetingRoomName,
@@ -24,6 +22,7 @@ public interface V2 {
             Long id,
             Long linkId,
             Long eventId,
+            Integer rating,
             String feedback
     ) {
     }

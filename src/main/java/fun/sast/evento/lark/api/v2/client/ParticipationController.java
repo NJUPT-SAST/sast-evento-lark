@@ -6,21 +6,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v2/user")
-public class ParticipationController {
+@RequestMapping("/api/v2/client/participation")
+class ParticipationController {
 
-    @PostMapping("/checkin")
-    public Boolean checkin(@RequestParam Integer eventId) {
+    @PostMapping("/checkin/{eventId}")
+    public Boolean checkin(@PathVariable Integer eventId) {
         return true;
     }
 
-    @PostMapping("/subscribe")
-    public Boolean subscribe(@RequestParam Integer eventId, @RequestParam Boolean subscribe) {
+    @PostMapping("/subscribe/{eventId}")
+    public Boolean subscribe(@PathVariable Integer eventId, @RequestParam Boolean subscribe) {
         return true;
     }
 
-    @PostMapping("/subscribe")
-    public Boolean subscribe(@RequestParam String larkDepartment, @RequestParam Boolean subscribe) {
+    @PostMapping("/subscribe/{larkDepartment}")
+    public Boolean subscribe(@PathVariable String larkDepartment, @RequestParam Boolean subscribe) {
         return true;
     }
 
@@ -29,7 +29,7 @@ public class ParticipationController {
         return List.of();
     }
 
-    @PostMapping("/subscribed")
+    @GetMapping("/subscribed")
     public List<V2.Event> getSubscribedEvents() {
         return List.of();
     }
