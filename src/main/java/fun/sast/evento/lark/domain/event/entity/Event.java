@@ -23,8 +23,6 @@ public class Event {
     private String location;
     private String tag;
     private String attachmentUrl;
-    private Long like;
-    private Long disLike;
     private String larkEventUid;
     private String larkMeetingRoomId;
     private String larkMeetingRoomName;

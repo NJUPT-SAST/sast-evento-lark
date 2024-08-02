@@ -4,11 +4,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("feedback")
-public class Feedback {
+@TableName("attachment")
+public class Attachment {
     private Long id;
-    private Long linkId;
     private Long eventId;
-    private Integer rating;
-    private String feedback;
+    private String url;
 }
