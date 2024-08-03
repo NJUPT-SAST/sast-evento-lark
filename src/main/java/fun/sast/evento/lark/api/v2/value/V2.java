@@ -2,6 +2,13 @@ package fun.sast.evento.lark.api.v2.value;
 
 public interface V2 {
 
+    record Attachment(
+            Long id,
+            String eventId,
+            String url
+    ) {
+    }
+
     record Event(
             Long id,
             String summary,
@@ -10,11 +17,10 @@ public interface V2 {
             String end,
             String location,
             String tag,
-            String attachmentUrl,
-            String larkEventUid,
             String larkMeetingRoomId,
             String larkMeetingRoomName,
-            String larkDepartment
+            String larkDepartmentId,
+            String larkDepartmentName
     ) {
     }
 

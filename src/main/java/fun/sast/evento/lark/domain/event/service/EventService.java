@@ -9,7 +9,7 @@ import fun.sast.evento.lark.domain.event.value.EventQuery;
 public interface EventService {
     Event create(EventCreate create);
 
-    Boolean modify(Integer id, EventModify modify);
+    Event modify(Integer id, EventModify modify);
 
     Boolean delete(Integer id);
 
