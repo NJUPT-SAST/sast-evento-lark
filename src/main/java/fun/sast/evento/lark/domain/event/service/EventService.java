@@ -9,11 +9,11 @@ import fun.sast.evento.lark.domain.event.value.EventQuery;
 public interface EventService {
     Event create(EventCreate create);
 
-    Boolean modify(Integer id, EventModify modify);
+    Event modify(Integer id, EventModify modify);
 
     Boolean delete(Integer id);
 
     Pagination<Event> list(Integer current, Integer size);
 
-    Pagination<Event> query(EventQuery query, Integer size);
+    Pagination<Event> query(EventQuery query, Integer current, Integer size);
 }

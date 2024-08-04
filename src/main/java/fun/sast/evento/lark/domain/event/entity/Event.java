@@ -22,10 +22,8 @@ public class Event {
     private LocalDateTime end;
     private String location;
     private String tag;
-    private String attachmentUrl;
     private String larkEventUid;
     private String larkMeetingRoomId;
-    private String larkMeetingRoomName;
-    private String larkDepartment;
+    private String larkDepartmentId;
 }
 //实体类，和其他模块有关联，有影响的部分

@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 class EventController {
 
     @PostMapping("/create")
-    public Boolean createEvent(@RequestBody V2.Event event) {
-        return true;
+    public V2.Event createEvent(@RequestBody V2.CreateEventRequest event) {
+        return null;
     }
 
     @DeleteMapping("/delete/{eventId}")
@@ -18,7 +18,7 @@ class EventController {
     }
 
     @PutMapping("/modify/{eventId}")
-    public Boolean modifyEvent(@PathVariable Integer eventId, @RequestBody V2.Event event) {
-        return true;
+    public V2.Event modifyEvent(@PathVariable Integer eventId, @RequestBody V2.UpdateEventRequest event) {
+        return null;
     }
 }

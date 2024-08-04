@@ -27,7 +27,7 @@ class EventController {
     }
 
     @GetMapping("/attachment/{eventId}")
-    public List<V2.Event> getAttachments(@PathVariable Integer eventId) {
+    public List<V2.Attachment> getAttachments(@PathVariable Integer eventId) {
         return List.of();
     }
 }

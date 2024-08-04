@@ -2,19 +2,59 @@ package fun.sast.evento.lark.api.v2.value;
 
 public interface V2 {
 
+    record Attachment(
+            Long id,
+            String eventId,
+            String url
+    ) {
+    }
+
+    enum EventState {
+        SIGNING_UP,
+        ACTIVE,
+        COMPLETED,
+        CANCELLED
+    }
+
     record Event(
             Long id,
             String summary,
             String description,
             String start,
             String end,
+            EventState state,
             String location,
             String tag,
-            String attachmentUrl,
-            String larkEventUid,
             String larkMeetingRoomId,
             String larkMeetingRoomName,
-            String larkDepartment
+            String larkDepartmentId,
+            String larkDepartmentName,
+            Boolean isSubscribed,
+            Boolean isCheckedIn
+    ) {
+    }
+
+    record CreateEventRequest(
+            String summary,
+            String description,
+            String start,
+            String end,
+            String location,
+            String tag,
+            String larkMeetingRoomId,
+            String larkDepartmentId
+    ) {
+    }
+
+    record UpdateEventRequest(
+            String summary,
+            String description,
+            String start,
+            String end,
+            String location,
+            String tag,
+            String larkMeetingRoomId,
+            String larkDepartmentId
     ) {
     }
 
@@ -50,6 +90,12 @@ public interface V2 {
             String avatar,
             String org,
             String nickname
+    ) {
+    }
+
+    record Department(
+            String id,
+            String name
     ) {
     }
 
