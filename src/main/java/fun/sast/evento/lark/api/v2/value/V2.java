@@ -34,6 +34,30 @@ public interface V2 {
     ) {
     }
 
+    record CreateEventRequest(
+            String summary,
+            String description,
+            String start,
+            String end,
+            String location,
+            String tag,
+            String larkMeetingRoomId,
+            String larkDepartmentId
+    ) {
+    }
+
+    record UpdateEventRequest(
+            String summary,
+            String description,
+            String start,
+            String end,
+            String location,
+            String tag,
+            String larkMeetingRoomId,
+            String larkDepartmentId
+    ) {
+    }
+
     record Feedback(
             Long id,
             Long linkId,
@@ -66,6 +90,12 @@ public interface V2 {
             String avatar,
             String org,
             String nickname
+    ) {
+    }
+
+    record Department(
+            String id,
+            String name
     ) {
     }
 

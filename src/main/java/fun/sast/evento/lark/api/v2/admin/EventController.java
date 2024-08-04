@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 class EventController {
 
     @PostMapping("/create")
-    public V2.Event createEvent(@RequestBody V2.Event event) {
+    public V2.Event createEvent(@RequestBody V2.CreateEventRequest event) {
         return null;
     }
 
@@ -18,7 +18,7 @@ class EventController {
     }
 
     @PutMapping("/modify/{eventId}")
-    public V2.Event modifyEvent(@PathVariable Integer eventId, @RequestBody V2.Event event) {
+    public V2.Event modifyEvent(@PathVariable Integer eventId, @RequestBody V2.UpdateEventRequest event) {
         return null;
     }
 }

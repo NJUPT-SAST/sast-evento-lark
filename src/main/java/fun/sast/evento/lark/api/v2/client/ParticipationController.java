@@ -9,8 +9,8 @@ import java.util.List;
 @RequestMapping("/api/v2/client/participation")
 class ParticipationController {
 
-    @PostMapping("/checkin/{eventId}")
-    public Boolean checkin(@PathVariable Integer eventId) {
+    @PostMapping("/check-in/{eventId}")
+    public Boolean checkIn(@PathVariable Integer eventId, @RequestParam String code) {
         return true;
     }
 
