@@ -9,18 +9,28 @@ public interface V2 {
     ) {
     }
 
+    enum EventState {
+        SIGNING_UP,
+        ACTIVE,
+        COMPLETED,
+        CANCELLED
+    }
+
     record Event(
             Long id,
             String summary,
             String description,
             String start,
             String end,
+            EventState state,
             String location,
             String tag,
             String larkMeetingRoomId,
             String larkMeetingRoomName,
             String larkDepartmentId,
-            String larkDepartmentName
+            String larkDepartmentName,
+            Boolean isSubscribed,
+            Boolean isCheckedIn
     ) {
     }
 

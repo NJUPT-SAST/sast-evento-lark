@@ -10,7 +10,7 @@ import java.util.List;
 public interface LarkEventService {
     LarkEvent create(LarkEventCreate create);
 
-    Boolean modify(Integer id, LarkEventModify modify);
+    LarkEvent modify(Integer id, LarkEventModify modify);
 
     Boolean delete(Integer id);
 

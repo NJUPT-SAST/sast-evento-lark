@@ -15,5 +15,5 @@ public interface EventService {
 
     Pagination<Event> list(Integer current, Integer size);
 
-    Pagination<Event> query(EventQuery query, Integer size);
+    Pagination<Event> query(EventQuery query, Integer current, Integer size);
 }
