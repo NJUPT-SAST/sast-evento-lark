@@ -11,8 +11,13 @@ import java.util.List;
 @RequestMapping("/api/v2/admin/lark")
 class LarkController {
 
-    @GetMapping("/departments")
+    @GetMapping("/department")
     public List<V2.Department> getAllDepartments() {
+        return List.of();
+    }
+
+    @GetMapping("/meeting-room")
+    public List<V2.MeetingRoom> getAllMeetingRooms() {
         return List.of();
     }
 }

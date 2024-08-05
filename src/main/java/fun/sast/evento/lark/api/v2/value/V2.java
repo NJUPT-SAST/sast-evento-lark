@@ -67,15 +67,6 @@ public interface V2 {
     ) {
     }
 
-    record Participation(
-            Long id,
-            Long linkId,
-            Long eventId,
-            Boolean isSubscribed,
-            Boolean isCheckIn
-    ) {
-    }
-
     record Slide(
             Long id,
             String eventId,
@@ -96,6 +87,17 @@ public interface V2 {
     record Department(
             String id,
             String name
+    ) {
+    }
+
+    record MeetingRoom(
+            String id,
+            String name,
+            Integer capacity,
+            Boolean status,
+            Boolean scheduleStatus,
+            String disableStartTime,
+            String disableEndTime
     ) {
     }
 

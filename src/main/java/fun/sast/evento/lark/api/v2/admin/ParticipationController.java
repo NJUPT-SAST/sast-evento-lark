@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v2/admin/participation")
+@RequestMapping("/api/v2/admin/event")
 class ParticipationController {
 
-    @PostMapping("/code/{eventId}")
+    @PostMapping("/{eventId}/code")
     public String generateCheckInCode(@PathVariable Integer eventId) {
         return null;
     }

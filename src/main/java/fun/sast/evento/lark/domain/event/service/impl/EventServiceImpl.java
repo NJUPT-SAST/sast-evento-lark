@@ -6,7 +6,7 @@ import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.value.EventCreate;
-import fun.sast.evento.lark.domain.event.value.EventModify;
+import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
@@ -55,13 +55,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Event modify(Integer id, EventModify modify) {
+    public Event update(Integer id, EventUpdate update) {
         Event event = eventMapper.selectById(id);
-        validateAndSetTimes(event, modify.start(), modify.end());
-        event.setSummary(modify.summary());
-        event.setDescription(modify.description());
-        event.setLocation(modify.location());
-        event.setTag(modify.tag());
+        validateAndSetTimes(event, update.start(), update.end());
+        event.setSummary(update.summary());
+        event.setDescription(update.description());
+        event.setLocation(update.location());
+        event.setTag(update.tag());
         eventMapper.updateById(event);
         return event;
     }

@@ -1,6 +1,6 @@
 package fun.sast.evento.lark.domain.event.value;
 
-public record EventModify(
+public record EventUpdate(
         String summary,
         String description,
         String start,

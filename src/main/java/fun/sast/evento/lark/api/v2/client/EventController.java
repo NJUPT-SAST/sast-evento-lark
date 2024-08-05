@@ -26,7 +26,7 @@ class EventController {
         return new Pagination<>(List.of(), 0, 0);
     }
 
-    @GetMapping("/attachment/{eventId}")
+    @GetMapping("/{eventId}/attachment")
     public List<V2.Attachment> getAttachments(@PathVariable Integer eventId) {
         return List.of();
     }

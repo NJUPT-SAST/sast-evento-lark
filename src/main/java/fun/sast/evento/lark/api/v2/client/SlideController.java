@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v2/client/slide")
+@RequestMapping("/api/v2/client/event")
 class SlideController {
 
-    @GetMapping("/home")
-    public List<V2.Slide> home() {
+    @GetMapping("/slides")
+    public List<V2.Slide> getSlides() {
         return List.of();
     }
 
-    @GetMapping("/{eventId}")
-    public List<V2.Slide> event(@PathVariable Integer eventId) {
+    @GetMapping("/{eventId}/slides")
+    public List<V2.Slide> getSlides(@PathVariable Integer eventId) {
         return List.of();
     }
 }

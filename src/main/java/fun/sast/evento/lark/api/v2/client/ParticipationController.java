@@ -6,20 +6,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v2/client/participation")
+@RequestMapping("/api/v2/client/event")
 class ParticipationController {
 
-    @PostMapping("/check-in/{eventId}")
+    @PostMapping("/{eventId}/check-in")
     public Boolean checkIn(@PathVariable Integer eventId, @RequestParam String code) {
         return true;
     }
 
-    @PostMapping("/subscribe/{eventId}")
+    @PostMapping("/{eventId}/subscribe")
     public Boolean subscribe(@PathVariable Integer eventId, @RequestParam Boolean subscribe) {
         return true;
     }
 
-    @PostMapping("/subscribe/{larkDepartment}")
+    @PostMapping("/{larkDepartment}/subscribe")
     public Boolean subscribe(@PathVariable String larkDepartment, @RequestParam Boolean subscribe) {
         return true;
     }
