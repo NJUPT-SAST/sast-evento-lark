@@ -1,5 +1,9 @@
 package fun.sast.evento.lark.api.v2.value;
 
+import fun.sast.evento.lark.domain.common.value.EventState;
+
+import java.time.LocalDateTime;
+
 public interface V2 {
 
     record Attachment(
@@ -9,25 +13,16 @@ public interface V2 {
     ) {
     }
 
-    enum EventState {
-        SIGNING_UP,
-        ACTIVE,
-        COMPLETED,
-        CANCELLED
-    }
-
     record Event(
             Long id,
             String summary,
             String description,
-            String start,
-            String end,
+            LocalDateTime start,
+            LocalDateTime end,
             EventState state,
             String location,
             String tag,
-            String larkMeetingRoomId,
             String larkMeetingRoomName,
-            String larkDepartmentId,
             String larkDepartmentName,
             Boolean isSubscribed,
             Boolean isCheckedIn
@@ -37,8 +32,8 @@ public interface V2 {
     record CreateEventRequest(
             String summary,
             String description,
-            String start,
-            String end,
+            LocalDateTime start,
+            LocalDateTime end,
             String location,
             String tag,
             String larkMeetingRoomId,
@@ -49,8 +44,8 @@ public interface V2 {
     record UpdateEventRequest(
             String summary,
             String description,
-            String start,
-            String end,
+            LocalDateTime start,
+            LocalDateTime end,
             String location,
             String tag,
             String larkMeetingRoomId,

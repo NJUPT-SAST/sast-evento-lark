@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v2/admin/event")
-public class AttachmentController {
+class AttachmentController {
 
     @PostMapping("/{eventId}/attachment")
     public V2.Attachment uploadAttachment(@PathVariable Integer eventId, @RequestParam String url) {
