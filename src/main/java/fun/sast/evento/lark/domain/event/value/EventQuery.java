@@ -1,7 +1,10 @@
 package fun.sast.evento.lark.domain.event.value;
 
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 
+@Builder
 public record EventQuery(
         Long id,
         String summary,
@@ -11,6 +14,7 @@ public record EventQuery(
         String location,
         String tag,
         String larkMeetingRoomName,
-        String larkDepartmentName
+        String larkDepartmentName,
+        Boolean active
 ) {
 }

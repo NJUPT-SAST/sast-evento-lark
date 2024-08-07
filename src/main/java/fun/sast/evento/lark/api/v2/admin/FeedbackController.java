@@ -11,7 +11,7 @@ import java.util.List;
 class FeedbackController {
 
     @GetMapping("/{eventId}/feedback")
-    public Pagination<V2.Feedback> getAllFeedbacks(@PathVariable Integer eventId,
+    public Pagination<V2.Feedback> getAllFeedbacks(@PathVariable Long eventId,
                                                    @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                                                    @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         return new Pagination<>(List.of(), 0, 0);

@@ -11,12 +11,12 @@ class FeedbackController {
      * @return 用户自己对活动的反馈，如果为null则未评论
      **/
     @GetMapping("/{eventId}/feedback")
-    public V2.Feedback getFeedback(@PathVariable Integer eventId) {
+    public V2.Feedback getFeedback(@PathVariable Long eventId) {
         return null;
     }
 
     @PostMapping("/{eventId}/feedback")
-    public V2.Feedback createFeedback(@PathVariable Integer eventId,
+    public V2.Feedback createFeedback(@PathVariable Long eventId,
                                   @RequestParam Integer rating,
                                   @RequestParam String content) {
         return null;

@@ -10,18 +10,19 @@ import java.util.List;
 class ParticipationController {
 
     @PostMapping("/{eventId}/check-in")
-    public Boolean checkIn(@PathVariable Integer eventId, @RequestParam String code) {
-        return true;
+    public Boolean checkIn(@PathVariable Long eventId, @RequestParam String code) {
+        return null;
     }
 
-    @PostMapping("/{eventId}/subscribe")
-    public Boolean subscribe(@PathVariable Integer eventId, @RequestParam Boolean subscribe) {
-        return true;
-    }
-
-    @PostMapping("/{larkDepartment}/subscribe")
-    public Boolean subscribe(@PathVariable String larkDepartment, @RequestParam Boolean subscribe) {
-        return true;
+    @PostMapping("/{identifier}/subscribe")
+    public Boolean subscribe(@PathVariable String identifier, @RequestParam Boolean subscribe) {
+        if (identifier.matches("\\d+")) {
+            Long eventId = Long.parseLong(identifier);
+            // 处理活动订阅
+        } else {
+            // 处理部门订阅
+        }
+        return null;
     }
 
     @GetMapping("/participated")

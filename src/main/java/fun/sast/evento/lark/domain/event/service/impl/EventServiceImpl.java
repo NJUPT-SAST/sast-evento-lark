@@ -2,24 +2,32 @@ package fun.sast.evento.lark.domain.event.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.service.EventService;
+import fun.sast.evento.lark.domain.event.service.ParticipationService;
 import fun.sast.evento.lark.domain.event.value.EventCreate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
+import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
 import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@Service
 public class EventServiceImpl implements EventService {
 
     @Resource
     private LarkEventService larkEventService;
+    @Resource
+    private ParticipationService participationService;
     @Resource
     private EventMapper eventMapper;
 
@@ -96,11 +104,17 @@ public class EventServiceImpl implements EventService {
         if (query.description() != null) {
             queryWrapper.like("description", query.description());
         }
-        if (query.start() != null) {
-            queryWrapper.ge("start", query.start());
-        }
-        if (query.end() != null) {
-            queryWrapper.le("end", query.end());
+        LocalDateTime now = LocalDateTime.now();
+        if (Boolean.TRUE.equals(query.active())) {
+            queryWrapper.le("start", now);
+            queryWrapper.ge("end", now);
+        } else {
+            if (query.start() != null) {
+                queryWrapper.ge("start", query.start());
+            }
+            if (query.end() != null) {
+                queryWrapper.le("end", query.end());
+            }
         }
         if (query.location() != null) {
             queryWrapper.eq("location", query.location());
@@ -119,6 +133,45 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public List<Event> query(EventQuery query) {
+        QueryWrapper<Event> queryWrapper = new QueryWrapper<>();
+        if (query.id() != null) {
+            queryWrapper.eq("id", query.id());
+        }
+        if (query.summary() != null) {
+            queryWrapper.eq("summary", query.summary());
+        }
+        if (query.description() != null) {
+            queryWrapper.like("description", query.description());
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (Boolean.TRUE.equals(query.active())) {
+            queryWrapper.le("start", now);
+            queryWrapper.ge("end", now);
+        } else {
+            if (query.start() != null) {
+                queryWrapper.ge("start", query.start());
+            }
+            if (query.end() != null) {
+                queryWrapper.le("end", query.end());
+            }
+        }
+        if (query.location() != null) {
+            queryWrapper.eq("location", query.location());
+        }
+        if (query.tag() != null) {
+            queryWrapper.eq("tag", query.tag());
+        }
+        if (query.larkMeetingRoomName() != null) {
+            queryWrapper.eq("lark_meeting_room_name", query.larkMeetingRoomName());
+        }
+        if (query.larkDepartmentName() != null) {
+            queryWrapper.eq("lark_department_name", query.larkDepartmentName());
+        }
+        return eventMapper.selectList(queryWrapper);
+    }
+
+    @Override
     public EventState calculateState(Event event) {
         if (event.isCancelled()) {
             return EventState.CANCELLED;
@@ -131,5 +184,24 @@ public class EventServiceImpl implements EventService {
         } else {
             return EventState.ACTIVE;
         }
+    }
+
+    @Override
+    public V2.Event mapToV2Event(Event event) {
+        String linkId = JWTInterceptor.userHolder.get().getUserId();
+        return new V2.Event(
+                event.getId(),
+                event.getSummary(),
+                event.getDescription(),
+                event.getStart(),
+                event.getEnd(),
+                calculateState(event),
+                event.getLocation(),
+                event.getTag(),
+                event.getLarkMeetingRoomName(),
+                event.getLarkDepartmentName(),
+                participationService.isSubscribed(event.getId(), linkId),
+                participationService.isCheckedIn(event.getId(), linkId)
+        );
     }
 }

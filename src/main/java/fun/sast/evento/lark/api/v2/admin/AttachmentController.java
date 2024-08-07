@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.*;
 class AttachmentController {
 
     @PostMapping("/{eventId}/attachment")
-    public V2.Attachment uploadAttachment(@PathVariable Integer eventId, @RequestParam String url) {
+    public V2.Attachment uploadAttachment(@PathVariable Long eventId, @RequestParam String url) {
         return null;
 
     }
 
     @DeleteMapping("/{eventId}/attachment/{attachmentId}")
-    public Boolean deleteAttachment(@PathVariable Integer eventId, @PathVariable Integer attachmentId) {
+    public Boolean deleteAttachment(@PathVariable Long eventId, @PathVariable Long attachmentId) {
         return true;
     }
 }

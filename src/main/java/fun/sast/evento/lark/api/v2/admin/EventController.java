@@ -44,17 +44,17 @@ class EventController {
     }
 
     @DeleteMapping("/{eventId}/delete")
-    public Boolean deleteEvent(@PathVariable Integer eventId) {
+    public Boolean deleteEvent(@PathVariable Long eventId) {
         return true;
     }
 
     @PutMapping("/{eventId}/update")
-    public V2.Event updateEvent(@PathVariable Integer eventId, @RequestBody V2.UpdateEventRequest event) {
+    public V2.Event updateEvent(@PathVariable Long eventId, @RequestBody V2.UpdateEventRequest event) {
         return null;
     }
 
     @PostMapping("/{eventId}/cancel")
-    public V2.Event cancelEvent(@PathVariable Integer eventId) {
+    public V2.Event cancelEvent(@PathVariable Long eventId) {
         return null;
     }
 }

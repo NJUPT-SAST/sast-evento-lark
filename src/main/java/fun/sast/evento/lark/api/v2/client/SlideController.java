@@ -12,13 +12,13 @@ import java.util.List;
 @RequestMapping("/api/v2/client/event")
 class SlideController {
 
-    @GetMapping("/slides")
+    @GetMapping("/slide")
     public List<V2.Slide> getSlides() {
         return List.of();
     }
 
-    @GetMapping("/{eventId}/slides")
-    public List<V2.Slide> getSlides(@PathVariable Integer eventId) {
+    @GetMapping("/{eventId}/slide")
+    public List<V2.Slide> getSlides(@PathVariable Long eventId) {
         return List.of();
     }
 }

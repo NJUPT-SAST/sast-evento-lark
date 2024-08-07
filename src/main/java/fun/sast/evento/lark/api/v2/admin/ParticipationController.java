@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 class ParticipationController {
 
     @PostMapping("/{eventId}/code")
-    public String generateCheckInCode(@PathVariable Integer eventId) {
+    public String generateCheckInCode(@PathVariable Long eventId) {
         return null;
     }
 
