@@ -13,9 +13,11 @@ import java.util.List;
 public interface EventService {
     Event create(EventCreate create);
 
-    Event update(Integer id, EventUpdate update);
+    Event update(Long eventId, EventUpdate update);
 
-    Boolean delete(Integer id);
+    Boolean delete(Long eventId);
+
+    Event cancel(Long eventId);
 
     Pagination<Event> list(Integer current, Integer size);
 

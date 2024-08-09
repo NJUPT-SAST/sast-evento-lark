@@ -10,6 +10,7 @@ public record EventUpdate(
         String location,
         String tag,
         String larkMeetingRoomId,
-        String larkDepartmentId
+        String larkDepartmentId,
+        Boolean cancelled
 ) {
 }

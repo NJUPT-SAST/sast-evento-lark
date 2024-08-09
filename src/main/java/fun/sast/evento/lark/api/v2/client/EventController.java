@@ -26,7 +26,7 @@ class EventController {
                 .active(true)
                 .build();
         List<Event> events = eventService.query(query);
-        return events.stream().map(event -> eventService.mapToV2Event(event)).toList();
+        return events.stream().map(eventService::mapToV2Event).toList();
     }
 
     @GetMapping("/latest")
@@ -35,7 +35,7 @@ class EventController {
                 .start(LocalDateTime.now())
                 .build();
         List<Event> events = eventService.query(query);
-        return events.stream().map(event -> eventService.mapToV2Event(event)).toList();
+        return events.stream().map(eventService::mapToV2Event).toList();
     }
 
     @GetMapping("/history")
@@ -46,7 +46,7 @@ class EventController {
                 .build();
         Pagination<Event> events = eventService.query(query, page, size);
         return new Pagination<>(
-                events.elements().stream().map(event -> eventService.mapToV2Event(event)).toList(),
+                events.elements().stream().map(eventService::mapToV2Event).toList(),
                 events.current(),
                 events.total()
         );

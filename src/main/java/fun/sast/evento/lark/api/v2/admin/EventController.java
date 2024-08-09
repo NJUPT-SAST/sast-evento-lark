@@ -4,6 +4,7 @@ import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.value.EventCreate;
+import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,34 +28,34 @@ class EventController {
                 request.larkDepartmentId()
         );
         Event event = eventService.create(eventCreate);
-        return new V2.Event(
-                event.getId(),
-                event.getSummary(),
-                event.getDescription(),
-                event.getStart(),
-                event.getEnd(),
-                eventService.calculateState(event),
-                event.getLocation(),
-                event.getTag(),
-                event.getLarkMeetingRoomName(),
-                event.getLarkDepartmentName(),
-                false,
-                false
-        );
+        return eventService.mapToV2Event(event);
     }
 
     @DeleteMapping("/{eventId}/delete")
     public Boolean deleteEvent(@PathVariable Long eventId) {
-        return true;
+        return eventService.delete(eventId);
     }
 
     @PutMapping("/{eventId}/update")
-    public V2.Event updateEvent(@PathVariable Long eventId, @RequestBody V2.UpdateEventRequest event) {
-        return null;
+    public V2.Event updateEvent(@PathVariable Long eventId, @RequestBody V2.UpdateEventRequest request) {
+        EventUpdate eventUpdate = new EventUpdate(
+                request.summary(),
+                request.description(),
+                request.start(),
+                request.end(),
+                request.location(),
+                request.tag(),
+                request.larkMeetingRoomId(),
+                request.larkDepartmentId(),
+                request.cancelled()
+        );
+        Event event = eventService.update(eventId, eventUpdate);
+        return eventService.mapToV2Event(event);
     }
 
     @PostMapping("/{eventId}/cancel")
     public V2.Event cancelEvent(@PathVariable Long eventId) {
-        return null;
+        Event event = eventService.cancel(eventId);
+        return eventService.mapToV2Event(event);
     }
 }

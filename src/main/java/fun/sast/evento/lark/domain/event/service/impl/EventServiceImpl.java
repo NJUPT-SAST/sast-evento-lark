@@ -12,7 +12,6 @@ import fun.sast.evento.lark.domain.event.value.EventCreate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
-import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
 import jakarta.annotation.Resource;
@@ -57,7 +56,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Event update(Integer id, EventUpdate update) {
+    public Event update(Long eventId, EventUpdate update) {
         String larkMeetingRoomName = null;  // TODO: Implement this
         String larkDepartmentName = null;  // TODO: Implement this
         LocalDateTime start = update.start();
@@ -65,7 +64,7 @@ public class EventServiceImpl implements EventService {
         if (start.isAfter(end)) {
             throw new BusinessException("start time should be before end time");
         }
-        Event event = eventMapper.selectById(id);
+        Event event = eventMapper.selectById(eventId);
         event.setSummary(update.summary());
         event.setDescription(update.description());
 
@@ -75,13 +74,22 @@ public class EventServiceImpl implements EventService {
         event.setTag(update.tag());
         event.setLarkMeetingRoomName(larkMeetingRoomName);
         event.setLarkDepartmentName(larkDepartmentName);
+        event.setCancelled(update.cancelled());
         eventMapper.updateById(event);
         return event;
     }
 
     @Override
-    public Boolean delete(Integer id) {
-        return eventMapper.deleteById(id) > 0;
+    public Boolean delete(Long eventId) {
+        return eventMapper.deleteById(eventId) > 0;
+    }
+
+    @Override
+    public Event cancel(Long eventId) {
+        Event event = eventMapper.selectById(eventId);
+        event.setCancelled(true);
+        eventMapper.updateById(event);
+        return event;
     }
 
     @Override
@@ -188,7 +196,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public V2.Event mapToV2Event(Event event) {
-        String linkId = JWTInterceptor.userHolder.get().getUserId();
         return new V2.Event(
                 event.getId(),
                 event.getSummary(),
@@ -200,8 +207,8 @@ public class EventServiceImpl implements EventService {
                 event.getTag(),
                 event.getLarkMeetingRoomName(),
                 event.getLarkDepartmentName(),
-                participationService.isSubscribed(event.getId(), linkId),
-                participationService.isCheckedIn(event.getId(), linkId)
+                participationService.isSubscribed(event.getId()),
+                participationService.isCheckedIn(event.getId())
         );
     }
 }
