@@ -1,13 +1,16 @@
 package fun.sast.evento.lark.domain.event.value;
 
-public record EventModify(
+import java.time.LocalDateTime;
+
+public record EventUpdate(
         String summary,
         String description,
-        String start,
-        String end,
+        LocalDateTime start,
+        LocalDateTime end,
         String location,
         String tag,
         String larkMeetingRoomId,
-        String larkDepartmentId
+        String larkDepartmentId,
+        Boolean cancelled
 ) {
 }

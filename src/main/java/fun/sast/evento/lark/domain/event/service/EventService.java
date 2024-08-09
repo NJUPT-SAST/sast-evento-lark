@@ -1,19 +1,31 @@
 package fun.sast.evento.lark.domain.event.service;
 
+import fun.sast.evento.lark.api.v2.value.V2;
+import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.value.EventCreate;
-import fun.sast.evento.lark.domain.event.value.EventModify;
+import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
+
+import java.util.List;
 
 public interface EventService {
     Event create(EventCreate create);
 
-    Event modify(Integer id, EventModify modify);
+    Event update(Long eventId, EventUpdate update);
 
-    Boolean delete(Integer id);
+    Boolean delete(Long eventId);
+
+    Event cancel(Long eventId);
 
     Pagination<Event> list(Integer current, Integer size);
 
     Pagination<Event> query(EventQuery query, Integer current, Integer size);
+
+    List<Event> query(EventQuery query);
+
+    EventState calculateState(Event event);
+
+    V2.Event mapToV2Event(Event event);
 }

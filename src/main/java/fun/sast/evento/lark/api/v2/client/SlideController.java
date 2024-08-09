@@ -1,6 +1,9 @@
 package fun.sast.evento.lark.api.v2.client;
 
 import fun.sast.evento.lark.api.v2.value.V2;
+import fun.sast.evento.lark.domain.event.entity.Slide;
+import fun.sast.evento.lark.domain.event.service.SlideService;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,16 +12,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v2/client/slide")
+@RequestMapping("/api/v2/client/event")
 class SlideController {
 
-    @GetMapping("/home")
-    public List<V2.Slide> home() {
-        return List.of();
+    @Resource
+    private SlideService slideService;
+
+    @GetMapping("/slide")
+    public List<V2.Slide> getSlides() {
+        List<Slide> slides = slideService.getSlides();
+        return slides.stream().map(slideService::mapToV2Slide).toList();
     }
 
-    @GetMapping("/{eventId}")
-    public List<V2.Slide> event(@PathVariable Integer eventId) {
-        return List.of();
+    @GetMapping("/{eventId}/slide")
+    public List<V2.Slide> getSlides(@PathVariable Long eventId) {
+        List<Slide> slides = slideService.getSlides(eventId);
+        return slides.stream().map(slideService::mapToV2Slide).toList();
     }
 }

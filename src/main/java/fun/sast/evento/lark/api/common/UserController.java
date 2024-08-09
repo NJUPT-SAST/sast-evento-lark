@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v2/user")
-public class UserController {
+class UserController {
 
     @GetMapping("/profile")
-    public V2.User getProfile(){
+    V2.User getProfile(){
         return null;
     }
 }

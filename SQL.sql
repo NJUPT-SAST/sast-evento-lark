@@ -8,7 +8,8 @@ CREATE TABLE `event`
     `location`               VARCHAR(255),
     `tag`                    VARCHAR(255),
     `lark_event_uid`         VARCHAR(255),
-    `lark_meeting_room_id`   VARCHAR(255),
-    `lark_department_id`     VARCHAR(255),
+    `lark_meeting_room_name` VARCHAR(255),
+    `lark_department_name`   VARCHAR(255),
+    'cancelled'              BOOLEAN,
     PRIMARY KEY (`id`)
 );
