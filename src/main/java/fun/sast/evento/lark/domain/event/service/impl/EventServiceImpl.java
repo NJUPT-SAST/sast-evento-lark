@@ -12,47 +12,54 @@ import fun.sast.evento.lark.domain.event.service.ParticipationService;
 import fun.sast.evento.lark.domain.event.value.EventCreate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.event.value.EventUpdate;
+import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
+import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
 import fun.sast.evento.lark.domain.lark.value.LarkEventCreate;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
+import fun.sast.evento.lark.infrastructure.utils.TimeUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Service
 public class EventServiceImpl implements EventService {
 
     @Resource
+    private LarkDepartmentService larkDepartmentService;
+    @Resource
     private LarkEventService larkEventService;
+    @Resource
+    private LarkRoomService larkRoomService;
     @Resource
     private ParticipationService participationService;
     @Resource
     private EventMapper eventMapper;
 
-    private final ZoneId zone = ZoneId.systemDefault();
-
     @Override
     public Event create(EventCreate create) {
+        if (larkRoomService.available(create.larkMeetingRoomId(), create.start(), create.end())) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
+        }
         String larkEventUid = larkEventService.create(new LarkEventCreate(
                 create.summary(),
                 create.description(),
                 TimeInfo.newBuilder()
-                        .timestamp(String.valueOf(create.start().atZone(zone).toInstant().toEpochMilli()))
-                        .timezone(zone.toString())
+                        .timestamp(TimeUtils.toEpochMilli(create.start()))
+                        .timezone(TimeUtils.zone())
                         .build(),
                 TimeInfo.newBuilder()
-                        .timestamp(String.valueOf(create.end().atZone(zone).toInstant().toEpochMilli()))
-                        .timezone(zone.toString())
+                        .timestamp(TimeUtils.toEpochMilli(create.end()))
+                        .timezone(TimeUtils.zone())
                         .build(),
                 create.larkMeetingRoomId(),
                 create.larkDepartmentId()
         ));
-        String larkMeetingRoomName = null;  // TODO: Implement this
-        String larkDepartmentName = null;  // TODO: Implement this
+        String larkMeetingRoomName = larkRoomService.get(create.larkMeetingRoomId()).name();
+        String larkDepartmentName = larkDepartmentService.get(create.larkDepartmentId()).name();
         LocalDateTime start = create.start();
         LocalDateTime end = create.end();
         if (start.isAfter(end)) {
@@ -75,8 +82,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event update(Long eventId, EventUpdate update) {
-        String larkMeetingRoomName = null;  // TODO: Implement this
-        String larkDepartmentName = null;  // TODO: Implement this
+        if (larkRoomService.available(update.larkMeetingRoomId(), update.start(), update.end())) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
+        }
+        String larkMeetingRoomName = larkRoomService.get(update.larkMeetingRoomId()).name();
+        String larkDepartmentName = larkDepartmentService.get(update.larkDepartmentId()).name();
         LocalDateTime start = update.start();
         LocalDateTime end = update.end();
         if (start.isAfter(end)) {

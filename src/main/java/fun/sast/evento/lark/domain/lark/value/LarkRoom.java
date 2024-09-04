@@ -1,7 +1,8 @@
 package fun.sast.evento.lark.domain.lark.value;
 
-public record MeetingRoom(
+public record LarkRoom(
         String id,
-        String name
+        String name,
+        Integer capacity
 ) {
 }
