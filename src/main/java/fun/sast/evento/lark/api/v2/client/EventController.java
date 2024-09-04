@@ -3,11 +3,13 @@ package fun.sast.evento.lark.api.v2.client;
 import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Event;
-import fun.sast.evento.lark.domain.event.service.AttachmentService;
 import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,31 +20,31 @@ import java.util.List;
 class EventController {
 
     EventService eventService;
-    AttachmentService attachmentService;
 
-    @GetMapping("/active")
-    List<V2.Event> getActiveEvents() {
+    @GetMapping("/query")
+    Pagination<V2.Event> query(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                               @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+                               @RequestParam(value = "id", required = false) Long id,
+                               @RequestParam(value = "summary", required = false) String summary,
+                               @RequestParam(value = "description", required = false) String description,
+                               @RequestParam(value = "start", required = false) LocalDateTime start,
+                               @RequestParam(value = "end", required = false) LocalDateTime end,
+                               @RequestParam(value = "location", required = false) String location,
+                               @RequestParam(value = "tag", required = false) String tag,
+                               @RequestParam(value = "larkMeetingRoomName", required = false) String larkMeetingRoomName,
+                               @RequestParam(value = "larkDepartmentName", required = false) String larkDepartmentName,
+                               @RequestParam(value = "active", required = false) Boolean active) {
         EventQuery query = EventQuery.builder()
-                .active(true)
-                .build();
-        List<Event> events = eventService.query(query);
-        return events.stream().map(eventService::mapToV2Event).toList();
-    }
-
-    @GetMapping("/latest")
-    List<V2.Event> getLatestEvents() {
-        EventQuery query = EventQuery.builder()
-                .start(LocalDateTime.now())
-                .build();
-        List<Event> events = eventService.query(query);
-        return events.stream().map(eventService::mapToV2Event).toList();
-    }
-
-    @GetMapping("/history")
-    Pagination<V2.Event> getHistoryEvents(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-                                          @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
-        EventQuery query = EventQuery.builder()
-                .end(LocalDateTime.now())
+                .id(id)
+                .summary(summary)
+                .description(description)
+                .start(start)
+                .end(end)
+                .location(location)
+                .tag(tag)
+                .larkMeetingRoomName(larkMeetingRoomName)
+                .larkDepartmentName(larkDepartmentName)
+                .active(active)
                 .build();
         Pagination<Event> events = eventService.query(query, page, size);
         return new Pagination<>(
@@ -50,10 +52,5 @@ class EventController {
                 events.current(),
                 events.total()
         );
-    }
-
-    @GetMapping("/{eventId}/attachment")
-    List<V2.Attachment> getAttachments(@PathVariable Long eventId) {
-        return attachmentService.getAttachments(eventId).stream().map(attachmentService::mapToV2Attachment).toList();
     }
 }

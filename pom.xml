@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.qcloud</groupId>
             <artifactId>cos_api</artifactId>
-            <version>5.6.220</version>
+            <version>5.6.231</version>
         </dependency>
         <dependency>
             <groupId>com.auth0</groupId>

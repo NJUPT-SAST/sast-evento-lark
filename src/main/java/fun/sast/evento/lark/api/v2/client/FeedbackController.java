@@ -19,6 +19,9 @@ class FeedbackController {
     @GetMapping("/{eventId}/feedback")
     public V2.Feedback getFeedback(@PathVariable Long eventId) {
         Feedback feedback = feedbackService.getFeedback(eventId);
+        if(feedback == null){
+            return null;
+        }
         return feedbackService.mapToV2Feedback(feedback);
     }
 

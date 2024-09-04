@@ -5,6 +5,7 @@ import fun.sast.evento.lark.domain.event.entity.Attachment;
 import fun.sast.evento.lark.domain.event.service.AttachmentService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v2/admin/event")
@@ -14,8 +15,8 @@ class AttachmentController {
     private AttachmentService attachmentService;
 
     @PostMapping("/{eventId}/attachment")
-    public V2.Attachment uploadAttachment(@PathVariable Long eventId, @RequestParam String url) {
-        Attachment attachment = attachmentService.uploadAttachment(eventId, url);
+    public V2.Attachment uploadAttachment(@PathVariable Long eventId, @RequestParam MultipartFile file) {
+        Attachment attachment = attachmentService.uploadAttachment(eventId, file);
         return attachmentService.mapToV2Attachment(attachment);
     }
 

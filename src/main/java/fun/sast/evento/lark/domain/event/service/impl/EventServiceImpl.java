@@ -13,6 +13,7 @@ import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
+import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class EventServiceImpl implements EventService {
         LocalDateTime start = create.start();
         LocalDateTime end = create.end();
         if (start.isAfter(end)) {
-            throw new BusinessException("start time should be before end time");
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
         }
         Event event = new Event();
         event.setSummary(create.summary());
@@ -62,7 +63,7 @@ public class EventServiceImpl implements EventService {
         LocalDateTime start = update.start();
         LocalDateTime end = update.end();
         if (start.isAfter(end)) {
-            throw new BusinessException("start time should be before end time");
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
         }
         Event event = eventMapper.selectById(eventId);
         event.setSummary(update.summary());
@@ -93,6 +94,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public Event get(Long eventId) {
+        return eventMapper.selectById(eventId);
+    }
+
+    @Override
     public Pagination<Event> list(Integer current, Integer size) {
         Page<Event> page = new Page<>(current, size);
         eventMapper.selectPage(page, null);
@@ -103,80 +109,23 @@ public class EventServiceImpl implements EventService {
     public Pagination<Event> query(EventQuery query, Integer current, Integer size) {
         Page<Event> page = new Page<>(current, size);
         QueryWrapper<Event> queryWrapper = new QueryWrapper<>();
-        if (query.id() != null) {
-            queryWrapper.eq("id", query.id());
-        }
-        if (query.summary() != null) {
-            queryWrapper.eq("summary", query.summary());
-        }
-        if (query.description() != null) {
-            queryWrapper.like("description", query.description());
-        }
+        queryWrapper.eq(query.id() != null, "id", query.id());
+        queryWrapper.like(query.summary() != null, "summary", query.summary());
+        queryWrapper.like(query.description() != null, "description", query.description());
         LocalDateTime now = LocalDateTime.now();
         if (Boolean.TRUE.equals(query.active())) {
             queryWrapper.le("start", now);
             queryWrapper.ge("end", now);
         } else {
-            if (query.start() != null) {
-                queryWrapper.ge("start", query.start());
-            }
-            if (query.end() != null) {
-                queryWrapper.le("end", query.end());
-            }
+            queryWrapper.ge(query.start() != null, "start", query.start());
+            queryWrapper.le(query.end() != null, "end", query.end());
         }
-        if (query.location() != null) {
-            queryWrapper.eq("location", query.location());
-        }
-        if (query.tag() != null) {
-            queryWrapper.eq("tag", query.tag());
-        }
-        if (query.larkMeetingRoomName() != null) {
-            queryWrapper.eq("lark_meeting_room_name", query.larkMeetingRoomName());
-        }
-        if (query.larkDepartmentName() != null) {
-            queryWrapper.eq("lark_department_name", query.larkDepartmentName());
-        }
+        queryWrapper.eq(query.location() != null, "location", query.location());
+        queryWrapper.eq(query.tag() != null, "tag", query.tag());
+        queryWrapper.eq(query.larkMeetingRoomName() != null, "lark_meeting_room_name", query.larkMeetingRoomName());
+        queryWrapper.eq(query.larkDepartmentName() != null, "lark_department_name", query.larkDepartmentName());
         eventMapper.selectPage(page, queryWrapper);
         return new Pagination<>(page.getRecords(), page.getCurrent(), page.getTotal());
-    }
-
-    @Override
-    public List<Event> query(EventQuery query) {
-        QueryWrapper<Event> queryWrapper = new QueryWrapper<>();
-        if (query.id() != null) {
-            queryWrapper.eq("id", query.id());
-        }
-        if (query.summary() != null) {
-            queryWrapper.eq("summary", query.summary());
-        }
-        if (query.description() != null) {
-            queryWrapper.like("description", query.description());
-        }
-        LocalDateTime now = LocalDateTime.now();
-        if (Boolean.TRUE.equals(query.active())) {
-            queryWrapper.le("start", now);
-            queryWrapper.ge("end", now);
-        } else {
-            if (query.start() != null) {
-                queryWrapper.ge("start", query.start());
-            }
-            if (query.end() != null) {
-                queryWrapper.le("end", query.end());
-            }
-        }
-        if (query.location() != null) {
-            queryWrapper.eq("location", query.location());
-        }
-        if (query.tag() != null) {
-            queryWrapper.eq("tag", query.tag());
-        }
-        if (query.larkMeetingRoomName() != null) {
-            queryWrapper.eq("lark_meeting_room_name", query.larkMeetingRoomName());
-        }
-        if (query.larkDepartmentName() != null) {
-            queryWrapper.eq("lark_department_name", query.larkDepartmentName());
-        }
-        return eventMapper.selectList(queryWrapper);
     }
 
     @Override
