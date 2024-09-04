@@ -2,6 +2,7 @@ package fun.sast.evento.lark.domain.event.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lark.oapi.service.calendar.v4.model.TimeInfo;
 import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.common.value.Pagination;
@@ -12,6 +13,7 @@ import fun.sast.evento.lark.domain.event.value.EventCreate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
+import fun.sast.evento.lark.domain.lark.value.LarkEventCreate;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
@@ -19,7 +21,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.ZoneId;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -31,9 +33,24 @@ public class EventServiceImpl implements EventService {
     @Resource
     private EventMapper eventMapper;
 
+    private final ZoneId zone = ZoneId.systemDefault();
+
     @Override
     public Event create(EventCreate create) {
-        String larkEventUid = null; // TODO: Implement this
+        String larkEventUid = larkEventService.create(new LarkEventCreate(
+                create.summary(),
+                create.description(),
+                TimeInfo.newBuilder()
+                        .timestamp(String.valueOf(create.start().atZone(zone).toInstant().toEpochMilli()))
+                        .timezone(zone.toString())
+                        .build(),
+                TimeInfo.newBuilder()
+                        .timestamp(String.valueOf(create.end().atZone(zone).toInstant().toEpochMilli()))
+                        .timezone(zone.toString())
+                        .build(),
+                create.larkMeetingRoomId(),
+                create.larkDepartmentId()
+        ));
         String larkMeetingRoomName = null;  // TODO: Implement this
         String larkDepartmentName = null;  // TODO: Implement this
         LocalDateTime start = create.start();
