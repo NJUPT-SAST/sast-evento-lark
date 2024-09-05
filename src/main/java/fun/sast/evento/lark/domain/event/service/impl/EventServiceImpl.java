@@ -41,7 +41,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event create(EventCreate create) {
-        if (larkRoomService.available(create.larkMeetingRoomId(), create.start(), create.end())) {
+        if (!larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
         String larkEventUid = larkEventService.create(new LarkEventCreate(
@@ -82,7 +82,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event update(Long eventId, EventUpdate update) {
-        if (larkRoomService.available(update.larkMeetingRoomId(), update.start(), update.end())) {
+        if (!larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
         String larkMeetingRoomName = larkRoomService.get(update.larkMeetingRoomId()).name();
@@ -127,9 +127,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Pagination<Event> list(Integer current, Integer size) {
-        Page<Event> page = new Page<>(current, size);
-        eventMapper.selectPage(page, null);
-        return new Pagination<>(page.getRecords(), page.getCurrent(), page.getTotal());
+        return new Pagination<>(eventMapper.selectList(new Page<>(current, size), null), current, size);
     }
 
     @Override
@@ -171,7 +169,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public V2.Event mapToV2Event(Event event) {
+    public V2.Event mapToV2(Event event) {
         return new V2.Event(
                 event.getId(),
                 event.getSummary(),

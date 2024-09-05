@@ -16,16 +16,16 @@ import java.util.List;
 class SlideController {
 
     @Resource
-    private SlideService slideService;
+    SlideService slideService;
 
     @GetMapping("/slide")
-    public List<V2.Slide> getSlides() {
+    List<V2.Slide> getSlides() {
         List<Slide> slides = slideService.getSlides();
         return slides.stream().map(slideService::mapToV2Slide).toList();
     }
 
     @GetMapping("/{eventId}/slide")
-    public List<V2.Slide> getSlides(@PathVariable Long eventId) {
+    List<V2.Slide> getSlides(@PathVariable Long eventId) {
         List<Slide> slides = slideService.getSlides(eventId);
         return slides.stream().map(slideService::mapToV2Slide).toList();
     }

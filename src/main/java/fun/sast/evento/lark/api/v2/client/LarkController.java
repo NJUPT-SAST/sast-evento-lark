@@ -9,10 +9,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v2/client/lark")
-public class LarkController {
+class LarkController {
 
     @GetMapping("/department")
-    public List<V2.Department> getAllDepartments() {
+    List<V2.Department> getAllDepartments() {
         return List.of();
     }
 }

@@ -14,5 +14,5 @@ public interface AttachmentService {
 
     List<Attachment> getAttachments(Long eventId);
 
-    V2.Attachment mapToV2Attachment(Attachment attachment);
+    V2.Attachment mapToV2(Attachment attachment);
 }

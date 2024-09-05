@@ -12,13 +12,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v2/client/event")
-public class AttachmentController {
+class AttachmentController {
 
     @Resource
-    private AttachmentService attachmentService;
+    AttachmentService attachmentService;
 
     @GetMapping("/{eventId}/attachment")
     List<V2.Attachment> getAttachments(@PathVariable Long eventId) {
-        return attachmentService.getAttachments(eventId).stream().map(attachmentService::mapToV2Attachment).toList();
+        return attachmentService.getAttachments(eventId).stream().map(attachmentService::mapToV2).toList();
     }
 }

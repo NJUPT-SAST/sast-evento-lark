@@ -12,16 +12,16 @@ import org.springframework.web.multipart.MultipartFile;
 class AttachmentController {
 
     @Resource
-    private AttachmentService attachmentService;
+    AttachmentService attachmentService;
 
     @PostMapping("/{eventId}/attachment")
-    public V2.Attachment uploadAttachment(@PathVariable Long eventId, @RequestParam MultipartFile file) {
+    V2.Attachment uploadAttachment(@PathVariable Long eventId, @RequestParam MultipartFile file) {
         Attachment attachment = attachmentService.uploadAttachment(eventId, file);
-        return attachmentService.mapToV2Attachment(attachment);
+        return attachmentService.mapToV2(attachment);
     }
 
     @DeleteMapping("/{eventId}/attachment/{attachmentId}")
-    public Boolean deleteAttachment(@PathVariable Long eventId, @PathVariable Long attachmentId) {
+    Boolean deleteAttachment(@PathVariable Long eventId, @PathVariable Long attachmentId) {
         return attachmentService.deleteAttachment(eventId, attachmentId);
     }
 }

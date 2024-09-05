@@ -62,7 +62,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public V2.Attachment mapToV2Attachment(Attachment attachment) {
+    public V2.Attachment mapToV2(Attachment attachment) {
         return new V2.Attachment(
                 attachment.getId(),
                 attachment.getEventId().toString(),

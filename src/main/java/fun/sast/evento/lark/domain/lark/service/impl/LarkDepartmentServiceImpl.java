@@ -4,6 +4,7 @@ import com.lark.oapi.service.contact.v3.model.ChildrenDepartmentReq;
 import com.lark.oapi.service.contact.v3.model.ChildrenDepartmentResp;
 import com.lark.oapi.service.contact.v3.model.GetDepartmentReq;
 import com.lark.oapi.service.contact.v3.model.GetDepartmentResp;
+import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.value.LarkDepartment;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
@@ -66,5 +67,13 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
+    }
+
+    @Override
+    public V2.Department mapToV2(LarkDepartment larkDepartment) {
+        return new V2.Department(
+                larkDepartment.openId(),
+                larkDepartment.name()
+        );
     }
 }

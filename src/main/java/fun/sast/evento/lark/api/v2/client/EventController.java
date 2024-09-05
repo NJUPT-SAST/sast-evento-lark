@@ -48,7 +48,7 @@ class EventController {
                 .build();
         Pagination<Event> events = eventService.query(query, page, size);
         return new Pagination<>(
-                events.elements().stream().map(eventService::mapToV2Event).toList(),
+                events.elements().stream().map(eventService::mapToV2).toList(),
                 events.current(),
                 events.total()
         );

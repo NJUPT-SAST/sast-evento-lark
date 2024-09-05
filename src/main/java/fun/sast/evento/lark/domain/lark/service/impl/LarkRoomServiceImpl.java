@@ -8,6 +8,7 @@ import com.lark.oapi.service.vc.v1.model.GetRoomReq;
 import com.lark.oapi.service.vc.v1.model.GetRoomResp;
 import com.lark.oapi.service.vc.v1.model.ListRoomReq;
 import com.lark.oapi.service.vc.v1.model.ListRoomResp;
+import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
 import fun.sast.evento.lark.domain.lark.value.LarkRoom;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
@@ -74,7 +75,7 @@ public class LarkRoomServiceImpl implements LarkRoomService {
     }
 
     @Override
-    public Boolean available(String id, LocalDateTime start, LocalDateTime end) {
+    public Boolean isAvailable(String id, LocalDateTime start, LocalDateTime end) {
         try {
             RawResponse resp = oApi.getClient().post(
                     "https://open.feishu.cn/open-apis/meeting_room/freebusy/batch_get?" +
@@ -93,5 +94,14 @@ public class LarkRoomServiceImpl implements LarkRoomService {
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
+    }
+
+    @Override
+    public V2.Room mapToV2(LarkRoom larkRoom) {
+        return new V2.Room(
+                larkRoom.id(),
+                larkRoom.name(),
+                larkRoom.capacity()
+        );
     }
 }

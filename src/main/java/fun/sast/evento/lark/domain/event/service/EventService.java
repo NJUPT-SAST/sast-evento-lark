@@ -25,5 +25,5 @@ public interface EventService {
 
     EventState calculateState(Event event);
 
-    V2.Event mapToV2Event(Event event);
+    V2.Event mapToV2(Event event);
 }

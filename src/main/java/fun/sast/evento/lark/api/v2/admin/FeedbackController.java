@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.*;
 class FeedbackController {
 
     @Resource
-    private FeedbackService feedbackService;
+    FeedbackService feedbackService;
 
     @GetMapping("/{eventId}/feedback")
-    public Pagination<V2.Feedback> getAllFeedbacks(@PathVariable Long eventId,
+    Pagination<V2.Feedback> getAllFeedbacks(@PathVariable Long eventId,
                                                    @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                                                    @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
-        Pagination<Feedback> feedbacks = feedbackService.getAllFeedbacks(eventId, page, size);
+        Pagination<Feedback> feedbacks = feedbackService.list(eventId, page, size);
         return new Pagination<>(
-                feedbacks.elements().stream().map(feedbackService::mapToV2Feedback).toList(),
+                feedbacks.elements().stream().map(feedbackService::mapToV2).toList(),
                 feedbacks.current(),
                 feedbacks.total());
     }
