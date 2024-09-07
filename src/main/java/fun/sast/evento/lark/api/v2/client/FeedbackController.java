@@ -11,22 +11,25 @@ import org.springframework.web.bind.annotation.*;
 class FeedbackController {
 
     @Resource
-    private FeedbackService feedbackService;
+    FeedbackService feedbackService;
 
     /**
      * @return 用户自己对活动的反馈，如果为null则未评论
      **/
     @GetMapping("/{eventId}/feedback")
-    public V2.Feedback getFeedback(@PathVariable Long eventId) {
+    V2.Feedback getFeedback(@PathVariable Long eventId) {
         Feedback feedback = feedbackService.getFeedback(eventId);
-        return feedbackService.mapToV2Feedback(feedback);
+        if(feedback == null){
+            return null;
+        }
+        return feedbackService.mapToV2(feedback);
     }
 
     @PostMapping("/{eventId}/feedback")
-    public V2.Feedback createFeedback(@PathVariable Long eventId,
+    V2.Feedback createFeedback(@PathVariable Long eventId,
                                       @RequestParam Integer rating,
                                       @RequestParam String content) {
         Feedback feedback = feedbackService.createFeedback(eventId, rating, content);
-        return feedbackService.mapToV2Feedback(feedback);
+        return feedbackService.mapToV2(feedback);
     }
 }

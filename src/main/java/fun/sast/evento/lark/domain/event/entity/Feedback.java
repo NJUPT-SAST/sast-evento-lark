@@ -13,5 +13,5 @@ public class Feedback {
     private Long eventId;
     private String linkId;
     private Integer rating;
-    private String feedback;
+    private String content;
 }

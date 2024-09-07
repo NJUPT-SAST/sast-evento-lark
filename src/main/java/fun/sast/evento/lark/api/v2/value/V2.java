@@ -56,10 +56,10 @@ public interface V2 {
 
     record Feedback(
             Long id,
-            Long linkId,
             Long eventId,
+            String linkId,
             Integer rating,
-            String feedback
+            String content
     ) {
     }
 
@@ -86,14 +86,10 @@ public interface V2 {
     ) {
     }
 
-    record MeetingRoom(
+    record Room(
             String id,
             String name,
-            Integer capacity,
-            Boolean status,
-            Boolean scheduleStatus,
-            String disableStartTime,
-            String disableEndTime
+            Integer capacity
     ) {
     }
 

@@ -15,17 +15,17 @@ import java.util.List;
 class ParticipationController {
 
     @Resource
-    private ParticipationService participationService;
+    ParticipationService participationService;
     @Resource
-    private EventService eventService;
+    EventService eventService;
 
     @PostMapping("/{eventId}/check-in")
-    public Boolean checkIn(@PathVariable Long eventId, @RequestParam String code) {
+    Boolean checkIn(@PathVariable Long eventId, @RequestParam String code) {
         return participationService.checkIn(eventId, code);
     }
 
     @PostMapping("/{identifier}/subscribe")
-    public Boolean subscribe(@PathVariable String identifier, @RequestParam Boolean subscribe) {
+    Boolean subscribe(@PathVariable String identifier, @RequestParam Boolean subscribe) {
         if (identifier.matches("\\d+")) {
             Long eventId = Long.parseLong(identifier);
             // 处理活动订阅
@@ -37,14 +37,14 @@ class ParticipationController {
     }
 
     @GetMapping("/participated")
-    public List<V2.Event> getParticipatedEvents() {
+    List<V2.Event> getParticipatedEvents() {
         List<Event> events = participationService.getParticipatedEvents();
-        return events.stream().map(eventService::mapToV2Event).toList();
+        return events.stream().map(eventService::mapToV2).toList();
     }
 
     @GetMapping("/subscribed")
-    public List<V2.Event> getSubscribedEvents() {
+    List<V2.Event> getSubscribedEvents() {
         List<Event> events = participationService.getSubscribedEvents();
-        return events.stream().map(eventService::mapToV2Event).toList();
+        return events.stream().map(eventService::mapToV2).toList();
     }
 }

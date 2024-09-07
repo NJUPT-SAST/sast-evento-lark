@@ -10,7 +10,7 @@ public interface FeedbackService {
 
     Feedback createFeedback(Long eventId, Integer rating, String content);
 
-    Pagination<Feedback> getAllFeedbacks(Long eventId, Integer page, Integer size);
+    Pagination<Feedback> list(Long eventId, Integer current, Integer size);
 
-    V2.Feedback mapToV2Feedback(Feedback feedback);
+    V2.Feedback mapToV2(Feedback feedback);
 }

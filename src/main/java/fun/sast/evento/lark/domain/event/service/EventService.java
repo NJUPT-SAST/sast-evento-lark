@@ -5,10 +5,8 @@ import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.value.EventCreate;
-import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
-
-import java.util.List;
+import fun.sast.evento.lark.domain.event.value.EventUpdate;
 
 public interface EventService {
     Event create(EventCreate create);
@@ -19,13 +17,13 @@ public interface EventService {
 
     Event cancel(Long eventId);
 
+    Event get(Long eventId);
+
     Pagination<Event> list(Integer current, Integer size);
 
     Pagination<Event> query(EventQuery query, Integer current, Integer size);
 
-    List<Event> query(EventQuery query);
-
     EventState calculateState(Event event);
 
-    V2.Event mapToV2Event(Event event);
+    V2.Event mapToV2(Event event);
 }

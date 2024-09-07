@@ -10,6 +10,6 @@ public record EventCreate(
         String location,
         String tag,
         String larkMeetingRoomId,
-        String larkDepartmentId
+        String larkDepartmentId // chat_id in lark
 ) {
 }

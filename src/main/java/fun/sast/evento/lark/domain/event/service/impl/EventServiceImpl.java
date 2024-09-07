@@ -2,6 +2,7 @@ package fun.sast.evento.lark.domain.event.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lark.oapi.service.calendar.v4.model.TimeInfo;
 import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.common.value.Pagination;
@@ -11,20 +12,28 @@ import fun.sast.evento.lark.domain.event.service.ParticipationService;
 import fun.sast.evento.lark.domain.event.value.EventCreate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.event.value.EventUpdate;
+import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
+import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
+import fun.sast.evento.lark.domain.lark.value.LarkEventCreate;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
+import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
+import fun.sast.evento.lark.infrastructure.utils.TimeUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class EventServiceImpl implements EventService {
 
     @Resource
+    private LarkDepartmentService larkDepartmentService;
+    @Resource
     private LarkEventService larkEventService;
+    @Resource
+    private LarkRoomService larkRoomService;
     @Resource
     private ParticipationService participationService;
     @Resource
@@ -32,13 +41,29 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event create(EventCreate create) {
-        String larkEventUid = null; // TODO: Implement this
-        String larkMeetingRoomName = null;  // TODO: Implement this
-        String larkDepartmentName = null;  // TODO: Implement this
+        if (!larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
+        }
+        String larkEventUid = larkEventService.create(new LarkEventCreate(
+                create.summary(),
+                create.description(),
+                TimeInfo.newBuilder()
+                        .timestamp(TimeUtils.toEpochMilli(create.start()))
+                        .timezone(TimeUtils.zone())
+                        .build(),
+                TimeInfo.newBuilder()
+                        .timestamp(TimeUtils.toEpochMilli(create.end()))
+                        .timezone(TimeUtils.zone())
+                        .build(),
+                create.larkMeetingRoomId(),
+                create.larkDepartmentId()
+        ));
+        String larkMeetingRoomName = larkRoomService.get(create.larkMeetingRoomId()).name();
+        String larkDepartmentName = larkDepartmentService.get(create.larkDepartmentId()).name();
         LocalDateTime start = create.start();
         LocalDateTime end = create.end();
         if (start.isAfter(end)) {
-            throw new BusinessException("start time should be before end time");
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
         }
         Event event = new Event();
         event.setSummary(create.summary());
@@ -57,12 +82,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event update(Long eventId, EventUpdate update) {
-        String larkMeetingRoomName = null;  // TODO: Implement this
-        String larkDepartmentName = null;  // TODO: Implement this
+        if (!larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
+        }
+        String larkMeetingRoomName = larkRoomService.get(update.larkMeetingRoomId()).name();
+        String larkDepartmentName = larkDepartmentService.get(update.larkDepartmentId()).name();
         LocalDateTime start = update.start();
         LocalDateTime end = update.end();
         if (start.isAfter(end)) {
-            throw new BusinessException("start time should be before end time");
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
         }
         Event event = eventMapper.selectById(eventId);
         event.setSummary(update.summary());
@@ -93,90 +121,36 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public Event get(Long eventId) {
+        return eventMapper.selectById(eventId);
+    }
+
+    @Override
     public Pagination<Event> list(Integer current, Integer size) {
-        Page<Event> page = new Page<>(current, size);
-        eventMapper.selectPage(page, null);
-        return new Pagination<>(page.getRecords(), page.getCurrent(), page.getTotal());
+        return new Pagination<>(eventMapper.selectList(new Page<>(current, size), null), current, size);
     }
 
     @Override
     public Pagination<Event> query(EventQuery query, Integer current, Integer size) {
         Page<Event> page = new Page<>(current, size);
         QueryWrapper<Event> queryWrapper = new QueryWrapper<>();
-        if (query.id() != null) {
-            queryWrapper.eq("id", query.id());
-        }
-        if (query.summary() != null) {
-            queryWrapper.eq("summary", query.summary());
-        }
-        if (query.description() != null) {
-            queryWrapper.like("description", query.description());
-        }
+        queryWrapper.eq(query.id() != null, "id", query.id());
+        queryWrapper.like(query.summary() != null, "summary", query.summary());
+        queryWrapper.like(query.description() != null, "description", query.description());
         LocalDateTime now = LocalDateTime.now();
         if (Boolean.TRUE.equals(query.active())) {
             queryWrapper.le("start", now);
             queryWrapper.ge("end", now);
         } else {
-            if (query.start() != null) {
-                queryWrapper.ge("start", query.start());
-            }
-            if (query.end() != null) {
-                queryWrapper.le("end", query.end());
-            }
+            queryWrapper.ge(query.start() != null, "start", query.start());
+            queryWrapper.le(query.end() != null, "end", query.end());
         }
-        if (query.location() != null) {
-            queryWrapper.eq("location", query.location());
-        }
-        if (query.tag() != null) {
-            queryWrapper.eq("tag", query.tag());
-        }
-        if (query.larkMeetingRoomName() != null) {
-            queryWrapper.eq("lark_meeting_room_name", query.larkMeetingRoomName());
-        }
-        if (query.larkDepartmentName() != null) {
-            queryWrapper.eq("lark_department_name", query.larkDepartmentName());
-        }
+        queryWrapper.eq(query.location() != null, "location", query.location());
+        queryWrapper.eq(query.tag() != null, "tag", query.tag());
+        queryWrapper.eq(query.larkMeetingRoomName() != null, "lark_meeting_room_name", query.larkMeetingRoomName());
+        queryWrapper.eq(query.larkDepartmentName() != null, "lark_department_name", query.larkDepartmentName());
         eventMapper.selectPage(page, queryWrapper);
         return new Pagination<>(page.getRecords(), page.getCurrent(), page.getTotal());
-    }
-
-    @Override
-    public List<Event> query(EventQuery query) {
-        QueryWrapper<Event> queryWrapper = new QueryWrapper<>();
-        if (query.id() != null) {
-            queryWrapper.eq("id", query.id());
-        }
-        if (query.summary() != null) {
-            queryWrapper.eq("summary", query.summary());
-        }
-        if (query.description() != null) {
-            queryWrapper.like("description", query.description());
-        }
-        LocalDateTime now = LocalDateTime.now();
-        if (Boolean.TRUE.equals(query.active())) {
-            queryWrapper.le("start", now);
-            queryWrapper.ge("end", now);
-        } else {
-            if (query.start() != null) {
-                queryWrapper.ge("start", query.start());
-            }
-            if (query.end() != null) {
-                queryWrapper.le("end", query.end());
-            }
-        }
-        if (query.location() != null) {
-            queryWrapper.eq("location", query.location());
-        }
-        if (query.tag() != null) {
-            queryWrapper.eq("tag", query.tag());
-        }
-        if (query.larkMeetingRoomName() != null) {
-            queryWrapper.eq("lark_meeting_room_name", query.larkMeetingRoomName());
-        }
-        if (query.larkDepartmentName() != null) {
-            queryWrapper.eq("lark_department_name", query.larkDepartmentName());
-        }
-        return eventMapper.selectList(queryWrapper);
     }
 
     @Override
@@ -195,7 +169,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public V2.Event mapToV2Event(Event event) {
+    public V2.Event mapToV2(Event event) {
         return new V2.Event(
                 event.getId(),
                 event.getSummary(),

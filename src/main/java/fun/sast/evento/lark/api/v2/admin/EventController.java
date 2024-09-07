@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 class EventController {
 
     @Resource
-    private EventService eventService;
+    EventService eventService;
 
     @PostMapping("/create")
-    public V2.Event createEvent(@RequestBody V2.CreateEventRequest request) {
+    V2.Event createEvent(@RequestBody V2.CreateEventRequest request) {
         EventCreate eventCreate = new EventCreate(
                 request.summary(),
                 request.description(),
@@ -28,16 +28,16 @@ class EventController {
                 request.larkDepartmentId()
         );
         Event event = eventService.create(eventCreate);
-        return eventService.mapToV2Event(event);
+        return eventService.mapToV2(event);
     }
 
     @DeleteMapping("/{eventId}/delete")
-    public Boolean deleteEvent(@PathVariable Long eventId) {
+    Boolean deleteEvent(@PathVariable Long eventId) {
         return eventService.delete(eventId);
     }
 
     @PutMapping("/{eventId}/update")
-    public V2.Event updateEvent(@PathVariable Long eventId, @RequestBody V2.UpdateEventRequest request) {
+    V2.Event updateEvent(@PathVariable Long eventId, @RequestBody V2.UpdateEventRequest request) {
         EventUpdate eventUpdate = new EventUpdate(
                 request.summary(),
                 request.description(),
@@ -50,12 +50,12 @@ class EventController {
                 request.cancelled()
         );
         Event event = eventService.update(eventId, eventUpdate);
-        return eventService.mapToV2Event(event);
+        return eventService.mapToV2(event);
     }
 
     @PostMapping("/{eventId}/cancel")
-    public V2.Event cancelEvent(@PathVariable Long eventId) {
+    V2.Event cancelEvent(@PathVariable Long eventId) {
         Event event = eventService.cancel(eventId);
-        return eventService.mapToV2Event(event);
+        return eventService.mapToV2(event);
     }
 }

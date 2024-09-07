@@ -1,18 +1,13 @@
 package fun.sast.evento.lark.domain.lark.service;
 
-import fun.sast.evento.lark.domain.lark.entity.LarkEvent;
 import fun.sast.evento.lark.domain.lark.value.LarkEventCreate;
 import fun.sast.evento.lark.domain.lark.value.LarkEventModify;
-import fun.sast.evento.lark.domain.lark.value.LarkEventQuery;
-
-import java.util.List;
 
 public interface LarkEventService {
-    LarkEvent create(LarkEventCreate create);
 
-    LarkEvent modify(Integer id, LarkEventModify modify);
+    String create(LarkEventCreate create);
 
-    Boolean delete(Integer id);
+    void modify(String id, LarkEventModify modify);
 
-    List<LarkEvent> query(LarkEventQuery query);
+    void delete(String id);
 }
