@@ -27,6 +27,7 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
         try {
             List<LarkDepartment> larkDepartments = new ArrayList<>();
             String pageToken = null;
+            boolean hasMore;
             do {
                 ChildrenDepartmentResp resp = oApi.getClient().contact().department().children(ChildrenDepartmentReq.newBuilder()
                         .departmentId("0") // root department id
@@ -43,7 +44,8 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
                         department.getName()
                 )));
                 pageToken = resp.getData().getPageToken();
-            } while (pageToken != null && !pageToken.isEmpty());
+                hasMore = resp.getData().getHasMore();
+            } while (hasMore);
             return larkDepartments;
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());

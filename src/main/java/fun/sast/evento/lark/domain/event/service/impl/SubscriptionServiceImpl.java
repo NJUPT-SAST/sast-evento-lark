@@ -1,11 +1,8 @@
 package fun.sast.evento.lark.domain.event.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.event.entity.DepartmentSubscription;
-import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.entity.Subscription;
-import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
 import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.cache.Cache;
@@ -22,8 +19,6 @@ import java.util.List;
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
 
-    @Resource
-    private EventService eventService;
     @Resource
     private SubscriptionMapper subscriptionMapper;
     @Resource
@@ -122,27 +117,24 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<Event> getParticipatedEvents() {
+    public List<Long> getParticipatedEvents() {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("link_id", getLinkId());
         queryWrapper.eq("checked_in", true);
         return subscriptionMapper.selectList(queryWrapper)
                 .stream()
                 .map(Subscription::getEventId)
-                .map(id -> eventService.get(id))
-                .filter(event -> eventService.calculateState(event) == EventState.COMPLETED)
                 .toList();
     }
 
     @Override
-    public List<Event> getSubscribedEvents() {
+    public List<Long> getSubscribedEvents() {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("link_id", getLinkId());
         queryWrapper.eq("subscribed", true);
         return subscriptionMapper.selectList(queryWrapper)
                 .stream()
                 .map(Subscription::getEventId)
-                .map(id -> eventService.get(id))
                 .toList();
     }
 

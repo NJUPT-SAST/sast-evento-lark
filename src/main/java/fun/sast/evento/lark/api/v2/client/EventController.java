@@ -33,7 +33,9 @@ class EventController {
                                @RequestParam(value = "tag", required = false) String tag,
                                @RequestParam(value = "larkMeetingRoomName", required = false) String larkMeetingRoomName,
                                @RequestParam(value = "larkDepartmentName", required = false) String larkDepartmentName,
-                               @RequestParam(value = "active", required = false) Boolean active) {
+                               @RequestParam(value = "active", required = false) Boolean active,
+                               @RequestParam(value = "active", required = false) Boolean participated,
+                               @RequestParam(value = "active", required = false) Boolean subscribed) {
         EventQuery query = EventQuery.builder()
                 .id(id)
                 .summary(summary)
@@ -45,6 +47,8 @@ class EventController {
                 .larkMeetingRoomName(larkMeetingRoomName)
                 .larkDepartmentName(larkDepartmentName)
                 .active(active)
+                .participated(participated)
+                .subscribed(subscribed)
                 .build();
         Pagination<Event> events = eventService.query(query, page, size);
         return new Pagination<>(

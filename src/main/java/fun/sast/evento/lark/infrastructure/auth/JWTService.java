@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 @Component
-@ConditionalOnProperty(prefix = "app.auth.jwt", name = {"secret,expire"})
+@ConditionalOnProperty(prefix = "app.auth.jwt", name = {"secret", "expire"})
 public class JWTService {
     private final ObjectMapper objectMapper;
     private final Algorithm algorithm;

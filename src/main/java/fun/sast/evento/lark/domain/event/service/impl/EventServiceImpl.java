@@ -47,7 +47,7 @@ public class EventServiceImpl implements EventService {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
         LarkDepartment department = larkDepartmentService.get(create.larkDepartmentId());
-        if(department == null) {
+        if (department == null) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "department not found");
         }
         String larkEventUid = larkEventService.create(new LarkEventCreate(
@@ -91,7 +91,7 @@ public class EventServiceImpl implements EventService {
         if (!larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
-        if(larkDepartmentService.get(update.larkDepartmentId()) == null) {
+        if (larkDepartmentService.get(update.larkDepartmentId()) == null) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "department not found");
         }
         String larkMeetingRoomName = larkRoomService.get(update.larkMeetingRoomId()).name();
@@ -173,6 +173,12 @@ public class EventServiceImpl implements EventService {
         queryWrapper.eq(query.tag() != null, "tag", query.tag());
         queryWrapper.eq(query.larkMeetingRoomName() != null, "lark_meeting_room_name", query.larkMeetingRoomName());
         queryWrapper.eq(query.larkDepartmentName() != null, "lark_department_name", query.larkDepartmentName());
+        if (query.participated()) {
+            queryWrapper.in("id", subscriptionService.getParticipatedEvents());
+        }
+        if (query.subscribed()) {
+            queryWrapper.in("id", subscriptionService.getSubscribedEvents());
+        }
         eventMapper.selectPage(page, queryWrapper);
         return new Pagination<>(page.getRecords(), page.getCurrent(), page.getTotal());
     }

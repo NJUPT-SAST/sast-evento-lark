@@ -18,7 +18,7 @@ public interface SubscriptionService {
 
     Boolean isCheckedIn(Long eventId);
 
-    List<Event> getParticipatedEvents();
+    List<Long> getParticipatedEvents();
 
-    List<Event> getSubscribedEvents();
+    List<Long> getSubscribedEvents();
 }

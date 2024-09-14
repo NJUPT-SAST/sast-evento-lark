@@ -18,6 +18,8 @@ import fun.sast.evento.lark.infrastructure.utils.TimeUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +36,7 @@ public class LarkRoomServiceImpl implements LarkRoomService {
         try {
             List<LarkRoom> larkRooms = new ArrayList<>();
             String pageToken = null;
+            boolean hasMore;
             do {
                 ListRoomResp resp = oApi.getClient().vc().room().list(ListRoomReq.newBuilder()
                         .pageSize(100) // max page size
@@ -48,7 +51,8 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                         room.getCapacity()
                 )));
                 pageToken = resp.getData().getPageToken();
-            } while (pageToken != null && !pageToken.isEmpty());
+                hasMore = resp.getData().getHasMore();
+            } while (hasMore);
             return larkRooms;
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
@@ -77,9 +81,12 @@ public class LarkRoomServiceImpl implements LarkRoomService {
     @Override
     public Boolean isAvailable(String id, LocalDateTime start, LocalDateTime end) {
         try {
+            String url = "https://open.feishu.cn/open-apis/meeting_room/freebusy/batch_get?" +
+                    "room_ids=" + id +
+                    "&time_min=" + URLEncoder.encode(TimeUtils.format(start), StandardCharsets.UTF_8) +
+                    "&time_max=" + URLEncoder.encode(TimeUtils.format(end), StandardCharsets.UTF_8);
             RawResponse resp = oApi.getClient().post(
-                    "https://open.feishu.cn/open-apis/meeting_room/freebusy/batch_get?" +
-                            "room_ids=" + id + "&time_min=" + TimeUtils.format(start) + "&time_max=" + TimeUtils.format(end),
+                    url,
                     null,
                     AccessTokenType.App);
             String result = new String(resp.getBody());
