@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@RestController(value = "v1SlideController")
 @RequestMapping("/api/v1/slide")
 class SlideController {
 

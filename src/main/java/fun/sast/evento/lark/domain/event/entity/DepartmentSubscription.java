@@ -6,12 +6,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("participation")
-public class Participation {
+@TableName("department_subscription")
+public class DepartmentSubscription {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-    private Long eventId;
+    private String departmentId;
     private String linkId;
-    private Boolean isSubscribed;
-    private Boolean isCheckedIn;
 }

@@ -7,7 +7,7 @@ import fun.sast.evento.lark.domain.event.entity.Feedback;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController(value = "adminFeedbackController")
 @RequestMapping("/api/v2/admin/event")
 class FeedbackController {
 

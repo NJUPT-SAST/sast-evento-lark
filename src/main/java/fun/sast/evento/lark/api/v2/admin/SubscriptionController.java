@@ -1,22 +1,22 @@
 package fun.sast.evento.lark.api.v2.admin;
 
-import fun.sast.evento.lark.domain.event.service.ParticipationService;
+import fun.sast.evento.lark.domain.event.service.SubscriptionService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController(value = "adminSubscriptionController")
 @RequestMapping("/api/v2/admin/event")
-class ParticipationController {
+class SubscriptionController {
 
     @Resource
-    ParticipationService participationService;
+    SubscriptionService subscriptionService;
 
     @PostMapping("/{eventId}/code")
     String generateCheckInCode(@PathVariable Long eventId) {
-        return participationService.generateCheckInCode(eventId);
+        return subscriptionService.generateCheckInCode(eventId);
     }
 
 }

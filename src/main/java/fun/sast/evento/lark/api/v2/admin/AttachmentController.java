@@ -7,7 +7,7 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@RestController
+@RestController(value = "adminAttachmentController")
 @RequestMapping("/api/v2/admin/event")
 class AttachmentController {
 

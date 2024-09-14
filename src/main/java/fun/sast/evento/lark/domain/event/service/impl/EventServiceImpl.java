@@ -8,14 +8,16 @@ import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.service.EventService;
-import fun.sast.evento.lark.domain.event.service.ParticipationService;
+import fun.sast.evento.lark.domain.event.service.SubscriptionService;
 import fun.sast.evento.lark.domain.event.value.EventCreate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
 import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
+import fun.sast.evento.lark.domain.lark.value.LarkDepartment;
 import fun.sast.evento.lark.domain.lark.value.LarkEventCreate;
+import fun.sast.evento.lark.domain.lark.value.LarkEventUpdate;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
@@ -35,7 +37,7 @@ public class EventServiceImpl implements EventService {
     @Resource
     private LarkRoomService larkRoomService;
     @Resource
-    private ParticipationService participationService;
+    private SubscriptionService subscriptionService;
     @Resource
     private EventMapper eventMapper;
 
@@ -43,6 +45,10 @@ public class EventServiceImpl implements EventService {
     public Event create(EventCreate create) {
         if (!larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
+        }
+        LarkDepartment department = larkDepartmentService.get(create.larkDepartmentId());
+        if(department == null) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "department not found");
         }
         String larkEventUid = larkEventService.create(new LarkEventCreate(
                 create.summary(),
@@ -56,7 +62,7 @@ public class EventServiceImpl implements EventService {
                         .timezone(TimeUtils.zone())
                         .build(),
                 create.larkMeetingRoomId(),
-                create.larkDepartmentId()
+                department.chatId()
         ));
         String larkMeetingRoomName = larkRoomService.get(create.larkMeetingRoomId()).name();
         String larkDepartmentName = larkDepartmentService.get(create.larkDepartmentId()).name();
@@ -85,6 +91,9 @@ public class EventServiceImpl implements EventService {
         if (!larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
+        if(larkDepartmentService.get(update.larkDepartmentId()) == null) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "department not found");
+        }
         String larkMeetingRoomName = larkRoomService.get(update.larkMeetingRoomId()).name();
         String larkDepartmentName = larkDepartmentService.get(update.larkDepartmentId()).name();
         LocalDateTime start = update.start();
@@ -93,6 +102,20 @@ public class EventServiceImpl implements EventService {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
         }
         Event event = eventMapper.selectById(eventId);
+        larkEventService.update(event.getLarkEventUid(), new LarkEventUpdate(
+                update.summary(),
+                update.description(),
+                TimeInfo.newBuilder()
+                        .timestamp(TimeUtils.toEpochMilli(update.start()))
+                        .timezone(TimeUtils.zone())
+                        .build(),
+                TimeInfo.newBuilder()
+                        .timestamp(TimeUtils.toEpochMilli(update.end()))
+                        .timezone(TimeUtils.zone())
+                        .build(),
+                update.larkMeetingRoomId(),
+                larkDepartmentService.get(update.larkDepartmentId()).chatId()
+        ));
         event.setSummary(update.summary());
         event.setDescription(update.description());
 
@@ -109,6 +132,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Boolean delete(Long eventId) {
+        larkEventService.delete(eventMapper.selectById(eventId).getLarkEventUid());
         return eventMapper.deleteById(eventId) > 0;
     }
 
@@ -181,8 +205,8 @@ public class EventServiceImpl implements EventService {
                 event.getTag(),
                 event.getLarkMeetingRoomName(),
                 event.getLarkDepartmentName(),
-                participationService.isSubscribed(event.getId()),
-                participationService.isCheckedIn(event.getId())
+                subscriptionService.isSubscribed(event.getId()),
+                subscriptionService.isCheckedIn(event.getId())
         );
     }
 }

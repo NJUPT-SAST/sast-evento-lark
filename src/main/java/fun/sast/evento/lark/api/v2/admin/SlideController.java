@@ -5,8 +5,9 @@ import fun.sast.evento.lark.domain.event.entity.Slide;
 import fun.sast.evento.lark.domain.event.service.SlideService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-@RestController
+@RestController(value = "adminSlideController")
 @RequestMapping("/api/v2/admin/event")
 class SlideController {
 
@@ -14,8 +15,8 @@ class SlideController {
     SlideService slideService;
 
     @PostMapping("/{eventId}/slide")
-    V2.Slide uploadSlide(@PathVariable Long eventId, @RequestParam String url, @RequestParam String link) {
-        Slide slide = slideService.uploadSlide(eventId, url, link);
+    V2.Slide uploadSlide(@PathVariable Long eventId, @RequestParam MultipartFile file, @RequestParam String link) {
+        Slide slide = slideService.uploadSlide(eventId, file, link);
         return slideService.mapToV2Slide(slide);
     }
 
@@ -25,8 +26,8 @@ class SlideController {
     }
 
     @PostMapping("/slide")
-    V2.Slide uploadSlide(@RequestParam String url, @RequestParam String link) {
-        Slide slide = slideService.uploadSlide(url, link);
+    V2.Slide uploadSlide(@RequestParam MultipartFile file, @RequestParam String link) {
+        Slide slide = slideService.uploadSlide(file, link);
         return slideService.mapToV2Slide(slide);
     }
 

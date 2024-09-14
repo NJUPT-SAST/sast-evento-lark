@@ -6,11 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("slide")
-public class Slide {
+@TableName("subscription")
+public class Subscription {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     private Long eventId;
-    private String key;
-    private String link;
+    private String linkId;
+    private Boolean subscribed;
+    private Boolean checkedIn;
 }

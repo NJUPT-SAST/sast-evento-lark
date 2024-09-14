@@ -32,10 +32,9 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "Event not found");
         }
         String key = oss.upload(file);
-        URL url = oss.url(key);
         Attachment attachment = new Attachment();
         attachment.setEventId(eventId);
-        attachment.setUrl(url.toString());
+        attachment.setKey(key);
         attachmentMapper.insert(attachment);
         return attachment;
     }
@@ -49,9 +48,8 @@ public class AttachmentServiceImpl implements AttachmentService {
         if (!attachment.getEventId().equals(eventId)) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "Unexpected attachment.");
         }
-        oss.delete(attachment.getUrl());
-        attachmentMapper.deleteById(attachmentId);
-        return true;
+        oss.delete(attachment.getKey());
+        return attachmentMapper.deleteById(attachmentId) > 0;
     }
 
     @Override
@@ -66,7 +64,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         return new V2.Attachment(
                 attachment.getId(),
                 attachment.getEventId().toString(),
-                attachment.getUrl()
+                oss.url(attachment.getKey()).toString()
         );
     }
 }
