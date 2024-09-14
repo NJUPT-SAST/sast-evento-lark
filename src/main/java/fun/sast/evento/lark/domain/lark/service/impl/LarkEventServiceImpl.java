@@ -40,6 +40,12 @@ public class LarkEventServiceImpl implements LarkEventService {
             }
             String id = createCalendarEventResp.getData().getEvent().getEventId();
 
+            /*
+            "user"：User
+            "chat"：Group
+            "resource"：Room
+            "third_party"：Email
+             */
             CalendarEventAttendee[] attendees = {
                     CalendarEventAttendee.newBuilder()
                             .type("resource")
@@ -58,7 +64,7 @@ public class LarkEventServiceImpl implements LarkEventService {
                             .build())
                     .build());
             if (!createCalendarEventAttendeeResp.success()) {
-                throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventResp.getMsg());
+                throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
             }
 
             return id;
@@ -126,9 +132,32 @@ public class LarkEventServiceImpl implements LarkEventService {
                             .attendeeIds(deleteIds.toArray(new String[0]))
                             .build())
                     .build());
-
             if (!batchDeleteCalendarEventAttendeeResp.success()) {
                 throw new BusinessException(ErrorEnum.LARK_ERROR, listCalendarEventAttendeeResp.getMsg());
+            }
+
+            List<CalendarEventAttendee> attendees = new ArrayList<>();
+            if (update.roomId() != null) {
+                attendees.add(CalendarEventAttendee.newBuilder()
+                        .type("resource")
+                        .roomId(update.roomId())
+                        .build());
+            }
+            if (update.groupId() != null) {
+                attendees.add(CalendarEventAttendee.newBuilder()
+                        .type("chat")
+                        .chatId(update.groupId())
+                        .build());
+            }
+            CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
+                    .calendarId(calendarId)
+                    .eventId(id)
+                    .createCalendarEventAttendeeReqBody(CreateCalendarEventAttendeeReqBody.newBuilder()
+                            .attendees(attendees.toArray(new CalendarEventAttendee[0]))
+                            .build())
+                    .build());
+            if (!createCalendarEventAttendeeResp.success()) {
+                throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
             }
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
