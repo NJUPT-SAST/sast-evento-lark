@@ -54,15 +54,15 @@ public class EventServiceImpl implements EventService {
                 create.summary(),
                 create.description(),
                 TimeInfo.newBuilder()
-                        .timestamp(TimeUtils.toEpochMilli(create.start()))
+                        .timestamp(TimeUtils.toEpochSecond(create.start()))
                         .timezone(TimeUtils.zone())
                         .build(),
                 TimeInfo.newBuilder()
-                        .timestamp(TimeUtils.toEpochMilli(create.end()))
+                        .timestamp(TimeUtils.toEpochSecond(create.end()))
                         .timezone(TimeUtils.zone())
                         .build(),
                 create.larkMeetingRoomId(),
-                department.chatId()
+                department.openId()
         ));
         String larkMeetingRoomName = larkRoomService.get(create.larkMeetingRoomId()).name();
         String larkDepartmentName = larkDepartmentService.get(create.larkDepartmentId()).name();
@@ -106,15 +106,15 @@ public class EventServiceImpl implements EventService {
                 update.summary(),
                 update.description(),
                 TimeInfo.newBuilder()
-                        .timestamp(TimeUtils.toEpochMilli(update.start()))
+                        .timestamp(TimeUtils.toEpochSecond(update.start()))
                         .timezone(TimeUtils.zone())
                         .build(),
                 TimeInfo.newBuilder()
-                        .timestamp(TimeUtils.toEpochMilli(update.end()))
+                        .timestamp(TimeUtils.toEpochSecond(update.end()))
                         .timezone(TimeUtils.zone())
                         .build(),
                 update.larkMeetingRoomId(),
-                larkDepartmentService.get(update.larkDepartmentId()).chatId()
+                update.larkDepartmentId()
         ));
         event.setSummary(update.summary());
         event.setDescription(update.description());

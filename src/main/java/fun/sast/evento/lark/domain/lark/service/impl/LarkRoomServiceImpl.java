@@ -45,11 +45,13 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                 if (!resp.success()) {
                     throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
                 }
-                Arrays.stream(resp.getData().getRooms()).forEach(room -> larkRooms.add(new LarkRoom(
-                        room.getRoomId(),
-                        room.getName(),
-                        room.getCapacity()
-                )));
+                if (resp.getData().getRooms() != null) {
+                    Arrays.stream(resp.getData().getRooms()).forEach(room -> larkRooms.add(new LarkRoom(
+                            room.getRoomId(),
+                            room.getName(),
+                            room.getCapacity()
+                    )));
+                }
                 pageToken = resp.getData().getPageToken();
                 hasMore = resp.getData().getHasMore();
             } while (hasMore);

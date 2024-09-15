@@ -8,6 +8,6 @@ public record LarkEventCreate(
         TimeInfo start,
         TimeInfo end,
         String roomId,
-        String groupId
+        String departmentId
 ) {
 }

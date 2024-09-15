@@ -21,6 +21,8 @@ public class LarkEventServiceImpl implements LarkEventService {
     private OApi oApi;
     @Value("${app.lark.calendar-id}")
     private String calendarId;
+    @Resource
+    private LarkDepartmentServiceImpl larkDepartmentServiceImpl;
 
     @Override
     public String create(LarkEventCreate create) {
@@ -29,6 +31,7 @@ public class LarkEventServiceImpl implements LarkEventService {
                 .description(create.description())
                 .startTime(create.start())
                 .endTime(create.end())
+                .attendeeAbility("can_invite_others")
                 .build();
         try {
             CreateCalendarEventResp createCalendarEventResp = oApi.getClient().calendar().calendarEvent().create(CreateCalendarEventReq.newBuilder()
@@ -46,16 +49,19 @@ public class LarkEventServiceImpl implements LarkEventService {
             "resource"：Room
             "third_party"：Email
              */
-            CalendarEventAttendee[] attendees = {
-                    CalendarEventAttendee.newBuilder()
-                            .type("resource")
-                            .roomId(create.roomId())
-                            .build(),
-                    CalendarEventAttendee.newBuilder()
-                            .type("chat")
-                            .chatId(create.groupId())
-                            .build()
-            };
+            List<String> users = larkDepartmentServiceImpl.getUserList(create.departmentId());
+            List<CalendarEventAttendee> attendeeList = new ArrayList<>();
+            attendeeList.add(CalendarEventAttendee.newBuilder()
+                    .type("resource")
+                    .roomId(create.roomId())
+                    .build());
+            for (String user : users) {
+                attendeeList.add(CalendarEventAttendee.newBuilder()
+                        .type("user")
+                        .userId(user)
+                        .build());
+            }
+            CalendarEventAttendee[] attendees = attendeeList.toArray(new CalendarEventAttendee[0]);
             CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
                     .calendarId(calendarId)
                     .eventId(id)
@@ -114,26 +120,28 @@ public class LarkEventServiceImpl implements LarkEventService {
                 throw new BusinessException(ErrorEnum.LARK_ERROR, listCalendarEventAttendeeResp.getMsg());
             }
             // Shouldn't have more pages
-            List<String> deleteIds = new ArrayList<>();
+            List<CalendarEventAttendeeId> deleteIds = new ArrayList<>();
 
             for (CalendarEventAttendee attendee : listCalendarEventAttendeeResp.getData().getItems()) {
                 if (update.roomId() != null && attendee.getType().equals("resource")) {
-                    deleteIds.add(attendee.getAttendeeId());
+                    deleteIds.add(CalendarEventAttendeeId.newBuilder().type("resource").roomId(attendee.getRoomId()).build());
                 }
 
-                if (update.groupId() != null && attendee.getType().equals("chat")) {
-                    deleteIds.add(attendee.getAttendeeId());
+                if (update.departmentId() != null && attendee.getType().equals("user")) {
+                    deleteIds.add(CalendarEventAttendeeId.newBuilder().type("user").userId(attendee.getUserId()).build());
                 }
             }
-            BatchDeleteCalendarEventAttendeeResp batchDeleteCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().batchDelete(BatchDeleteCalendarEventAttendeeReq.newBuilder()
-                    .calendarId(calendarId)
-                    .eventId(id)
-                    .batchDeleteCalendarEventAttendeeReqBody(BatchDeleteCalendarEventAttendeeReqBody.newBuilder()
-                            .attendeeIds(deleteIds.toArray(new String[0]))
-                            .build())
-                    .build());
-            if (!batchDeleteCalendarEventAttendeeResp.success()) {
-                throw new BusinessException(ErrorEnum.LARK_ERROR, listCalendarEventAttendeeResp.getMsg());
+            if (!deleteIds.isEmpty()) {
+                BatchDeleteCalendarEventAttendeeResp batchDeleteCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().batchDelete(BatchDeleteCalendarEventAttendeeReq.newBuilder()
+                        .calendarId(calendarId)
+                        .eventId(id)
+                        .batchDeleteCalendarEventAttendeeReqBody(BatchDeleteCalendarEventAttendeeReqBody.newBuilder()
+                                .deleteIds(deleteIds.toArray(new CalendarEventAttendeeId[0]))
+                                .build())
+                        .build());
+                if (!batchDeleteCalendarEventAttendeeResp.success()) {
+                    throw new BusinessException(ErrorEnum.LARK_ERROR, batchDeleteCalendarEventAttendeeResp.getMsg());
+                }
             }
 
             List<CalendarEventAttendee> attendees = new ArrayList<>();
@@ -143,21 +151,28 @@ public class LarkEventServiceImpl implements LarkEventService {
                         .roomId(update.roomId())
                         .build());
             }
-            if (update.groupId() != null) {
-                attendees.add(CalendarEventAttendee.newBuilder()
-                        .type("chat")
-                        .chatId(update.groupId())
-                        .build());
+            if (update.departmentId() != null) {
+                List<String> users = larkDepartmentServiceImpl.getUserList(update.departmentId());
+                for (String user : users) {
+                    attendees.add(CalendarEventAttendee.newBuilder()
+                            .type("user")
+                            .userId(user)
+                            .isOptional(true)
+                            .build());
+                }
             }
-            CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
-                    .calendarId(calendarId)
-                    .eventId(id)
-                    .createCalendarEventAttendeeReqBody(CreateCalendarEventAttendeeReqBody.newBuilder()
-                            .attendees(attendees.toArray(new CalendarEventAttendee[0]))
-                            .build())
-                    .build());
-            if (!createCalendarEventAttendeeResp.success()) {
-                throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
+            if (!attendees.isEmpty()) {
+                CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
+                        .calendarId(calendarId)
+                        .eventId(id)
+                        .createCalendarEventAttendeeReqBody(CreateCalendarEventAttendeeReqBody.newBuilder()
+                                .attendees(attendees.toArray(new CalendarEventAttendee[0]))
+                                .needNotification(true)
+                                .build())
+                        .build());
+                if (!createCalendarEventAttendeeResp.success()) {
+                    throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
+                }
             }
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
