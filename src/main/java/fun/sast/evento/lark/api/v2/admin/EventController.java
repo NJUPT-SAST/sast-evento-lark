@@ -8,7 +8,7 @@ import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController(value = "adminEventController")
 @RequestMapping("/api/v2/admin/event")
 class EventController {
 

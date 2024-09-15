@@ -4,7 +4,7 @@ import fun.sast.evento.lark.domain.event.entity.Event;
 
 import java.util.List;
 
-public interface ParticipationService {
+public interface SubscriptionService {
 
     String generateCheckInCode(Long eventId);
 
@@ -18,7 +18,7 @@ public interface ParticipationService {
 
     Boolean isCheckedIn(Long eventId);
 
-    List<Event> getParticipatedEvents();
+    List<Long> getParticipatedEvents();
 
-    List<Event> getSubscribedEvents();
+    List<Long> getSubscribedEvents();
 }

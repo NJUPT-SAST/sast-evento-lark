@@ -9,8 +9,8 @@ public class TimeUtils {
     private static final DateTimeFormatter RFC3339 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
     private static final ZoneId ZONE = ZoneId.systemDefault();
 
-    public static String toEpochMilli(LocalDateTime localDateTime) {
-        return String.valueOf(localDateTime.atZone(ZONE).toInstant().toEpochMilli());
+    public static String toEpochSecond(LocalDateTime localDateTime) {
+        return String.valueOf(localDateTime.atZone(ZONE).toEpochSecond());
     }
 
     public static String format(LocalDateTime localDateTime) {

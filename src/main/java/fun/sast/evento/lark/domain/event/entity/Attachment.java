@@ -11,5 +11,5 @@ public class Attachment {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     private Long eventId;
-    private String url;
+    private String key;
 }

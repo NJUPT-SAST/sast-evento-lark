@@ -1,9 +1,6 @@
 package fun.sast.evento.lark.domain.lark.service.impl;
 
-import com.lark.oapi.service.contact.v3.model.ChildrenDepartmentReq;
-import com.lark.oapi.service.contact.v3.model.ChildrenDepartmentResp;
-import com.lark.oapi.service.contact.v3.model.GetDepartmentReq;
-import com.lark.oapi.service.contact.v3.model.GetDepartmentResp;
+import com.lark.oapi.service.contact.v3.model.*;
 import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.value.LarkDepartment;
@@ -23,10 +20,12 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
     @Resource
     private OApi oApi;
 
+    @Override
     public List<LarkDepartment> list() {
         try {
             List<LarkDepartment> larkDepartments = new ArrayList<>();
             String pageToken = null;
+            boolean hasMore;
             do {
                 ChildrenDepartmentResp resp = oApi.getClient().contact().department().children(ChildrenDepartmentReq.newBuilder()
                         .departmentId("0") // root department id
@@ -37,13 +36,15 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
                 if (!resp.success()) {
                     throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
                 }
-                Arrays.stream(resp.getData().getItems()).forEach(department -> larkDepartments.add(new LarkDepartment(
-                        department.getOpenDepartmentId(),
-                        department.getChatId(),
-                        department.getName()
-                )));
+                if (resp.getData().getItems() != null) {
+                    Arrays.stream(resp.getData().getItems()).forEach(department -> larkDepartments.add(new LarkDepartment(
+                            department.getOpenDepartmentId(),
+                            department.getName()
+                    )));
+                }
                 pageToken = resp.getData().getPageToken();
-            } while (pageToken != null && !pageToken.isEmpty());
+                hasMore = resp.getData().getHasMore();
+            } while (hasMore);
             return larkDepartments;
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
@@ -61,9 +62,35 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
             }
             return new LarkDepartment(
                     resp.getData().getDepartment().getOpenDepartmentId(),
-                    resp.getData().getDepartment().getChatId(),
                     resp.getData().getDepartment().getName()
             );
+        } catch (Exception e) {
+            throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
+        }
+    }
+
+    @Override
+    public List<String> getUserList(String openId) {
+        try {
+            List<String> users = new ArrayList<>();
+            String pageToken = null;
+            boolean hasMore;
+            do {
+                FindByDepartmentUserResp resp = oApi.getClient().contact().user().findByDepartment(FindByDepartmentUserReq.newBuilder()
+                        .departmentId(openId)
+                        .pageSize(50)
+                        .pageToken(pageToken)
+                        .build());
+                if (!resp.success()) {
+                    throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
+                }
+                pageToken = resp.getData().getPageToken();
+                hasMore = resp.getData().getHasMore();
+                if (resp.getData().getItems() != null) {
+                    Arrays.stream(resp.getData().getItems()).forEach(user -> users.add(user.getOpenId()));
+                }
+            } while (hasMore);
+            return users;
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }

@@ -15,6 +15,8 @@ public record EventQuery(
         String tag,
         String larkMeetingRoomName,
         String larkDepartmentName,
-        Boolean active
+        Boolean active,
+        Boolean participated,
+        Boolean subscribed
 ) {
 }

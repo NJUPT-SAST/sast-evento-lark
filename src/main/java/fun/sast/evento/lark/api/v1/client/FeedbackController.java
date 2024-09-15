@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController(value = "v1FeedbackController")
 @RequestMapping("/api/v1/feedback")
 class FeedbackController {
 

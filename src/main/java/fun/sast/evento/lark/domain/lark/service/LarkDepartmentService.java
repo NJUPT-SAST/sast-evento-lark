@@ -11,5 +11,7 @@ public interface LarkDepartmentService {
 
     LarkDepartment get(String openId);
 
+    List<String> getUserList(String openId);
+
     V2.Department mapToV2(LarkDepartment larkDepartment);
 }

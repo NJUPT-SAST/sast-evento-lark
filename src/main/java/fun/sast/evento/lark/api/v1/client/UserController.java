@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController(value = "v1UserController")
 @RequestMapping("/api/v1/user")
 class UserController {
 

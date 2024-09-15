@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController(value = "v1EventController")
 @RequestMapping("/api/v1/event")
 class EventController {
 
