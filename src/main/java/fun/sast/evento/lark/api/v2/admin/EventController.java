@@ -46,7 +46,6 @@ class EventController {
                 request.location(),
                 request.tag(),
                 request.larkMeetingRoomId(),
-                request.larkDepartmentId(),
                 request.cancelled()
         );
         Event event = eventService.update(eventId, eventUpdate);

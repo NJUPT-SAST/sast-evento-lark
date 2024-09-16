@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.List;
 
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
@@ -52,14 +51,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (subscription == null) {
             subscription = new Subscription();
             subscription.setEventId(eventId);
-            subscription.setLinkId(JWTInterceptor.userHolder.get().getUserId());
+            subscription.setLinkId(getLinkId());
             subscription.setCheckedIn(true);
-            subscriptionMapper.insert(subscription);
+            return subscriptionMapper.insert(subscription) > 0;
         } else {
             subscription.setCheckedIn(true);
-            subscriptionMapper.updateById(subscription);
+            return subscriptionMapper.updateById(subscription) > 0;
         }
-        return true;
     }
 
     @Override
@@ -71,14 +69,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (subscription == null) {
             subscription = new Subscription();
             subscription.setEventId(eventId);
-            subscription.setLinkId(JWTInterceptor.userHolder.get().getUserId());
+            subscription.setLinkId(getLinkId());
             subscription.setSubscribed(subscribe);
-            subscriptionMapper.insert(subscription);
+            return subscriptionMapper.insert(subscription) > 0;
         } else {
             subscription.setSubscribed(subscribe);
-            subscriptionMapper.updateById(subscription);
+            return subscriptionMapper.updateById(subscription) > 0;
         }
-        return true;
     }
 
     @Override
@@ -90,12 +87,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (subscribe && departmentSubscription == null) {
             departmentSubscription = new DepartmentSubscription();
             departmentSubscription.setDepartmentId(departmentId);
-            departmentSubscription.setLinkId(JWTInterceptor.userHolder.get().getUserId());
-            departmentSubscriptionMapper.insert(departmentSubscription);
+            departmentSubscription.setLinkId(getLinkId());
+            return departmentSubscriptionMapper.insert(departmentSubscription) > 0;
         } else if (!subscribe && departmentSubscription != null) {
-            departmentSubscriptionMapper.deleteById(departmentSubscription.getId());
+            return departmentSubscriptionMapper.deleteById(departmentSubscription.getId()) > 0;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -117,25 +114,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<Long> getParticipatedEvents() {
-        QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
+    public Boolean isSubscribed(String departmentId) {
+        QueryWrapper<DepartmentSubscription> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("department_id", departmentId);
         queryWrapper.eq("link_id", getLinkId());
-        queryWrapper.eq("checked_in", true);
-        return subscriptionMapper.selectList(queryWrapper)
-                .stream()
-                .map(Subscription::getEventId)
-                .toList();
+        DepartmentSubscription departmentSubscription = departmentSubscriptionMapper.selectOne(queryWrapper);
+        return departmentSubscription != null;
     }
 
     @Override
-    public List<Long> getSubscribedEvents() {
+    public Boolean delete(Long eventId) {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("event_id", eventId);
         queryWrapper.eq("link_id", getLinkId());
-        queryWrapper.eq("subscribed", true);
-        return subscriptionMapper.selectList(queryWrapper)
-                .stream()
-                .map(Subscription::getEventId)
-                .toList();
+        return subscriptionMapper.delete(queryWrapper) > 0;
     }
 
     private String getLinkId() {

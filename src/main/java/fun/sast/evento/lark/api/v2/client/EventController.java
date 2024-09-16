@@ -34,8 +34,8 @@ class EventController {
                                @RequestParam(value = "larkMeetingRoomName", required = false) String larkMeetingRoomName,
                                @RequestParam(value = "larkDepartmentName", required = false) String larkDepartmentName,
                                @RequestParam(value = "active", required = false) Boolean active,
-                               @RequestParam(value = "active", required = false) Boolean participated,
-                               @RequestParam(value = "active", required = false) Boolean subscribed) {
+                               @RequestParam(value = "participated", required = false) Boolean participated,
+                               @RequestParam(value = "subscribed", required = false) Boolean subscribed) {
         EventQuery query = EventQuery.builder()
                 .id(id)
                 .summary(summary)

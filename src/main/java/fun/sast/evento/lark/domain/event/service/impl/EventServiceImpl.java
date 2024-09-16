@@ -15,9 +15,9 @@ import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
 import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
-import fun.sast.evento.lark.domain.lark.value.LarkDepartment;
 import fun.sast.evento.lark.domain.lark.value.LarkEventCreate;
 import fun.sast.evento.lark.domain.lark.value.LarkEventUpdate;
+import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
@@ -46,10 +46,6 @@ public class EventServiceImpl implements EventService {
         if (!larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
-        LarkDepartment department = larkDepartmentService.get(create.larkDepartmentId());
-        if (department == null) {
-            throw new BusinessException(ErrorEnum.PARAM_ERROR, "department not found");
-        }
         String larkEventUid = larkEventService.create(new LarkEventCreate(
                 create.summary(),
                 create.description(),
@@ -62,7 +58,7 @@ public class EventServiceImpl implements EventService {
                         .timezone(TimeUtils.zone())
                         .build(),
                 create.larkMeetingRoomId(),
-                department.openId()
+                create.larkDepartmentId()
         ));
         String larkMeetingRoomName = larkRoomService.get(create.larkMeetingRoomId()).name();
         String larkDepartmentName = larkDepartmentService.get(create.larkDepartmentId()).name();
@@ -83,19 +79,18 @@ public class EventServiceImpl implements EventService {
         event.setLarkMeetingRoomName(larkMeetingRoomName);
         event.setLarkDepartmentName(larkDepartmentName);
         eventMapper.insert(event);
+        if (subscriptionService.isSubscribed(create.larkDepartmentId())) {
+            subscriptionService.subscribeEvent(event.getId(), true);
+        }
         return event;
     }
 
     @Override
     public Event update(Long eventId, EventUpdate update) {
-        if (!larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
+        if (update.larkMeetingRoomId() != null && !larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
-        if (larkDepartmentService.get(update.larkDepartmentId()) == null) {
-            throw new BusinessException(ErrorEnum.PARAM_ERROR, "department not found");
-        }
         String larkMeetingRoomName = larkRoomService.get(update.larkMeetingRoomId()).name();
-        String larkDepartmentName = larkDepartmentService.get(update.larkDepartmentId()).name();
         LocalDateTime start = update.start();
         LocalDateTime end = update.end();
         if (start.isAfter(end)) {
@@ -113,8 +108,7 @@ public class EventServiceImpl implements EventService {
                         .timestamp(TimeUtils.toEpochSecond(update.end()))
                         .timezone(TimeUtils.zone())
                         .build(),
-                update.larkMeetingRoomId(),
-                update.larkDepartmentId()
+                update.larkMeetingRoomId()
         ));
         event.setSummary(update.summary());
         event.setDescription(update.description());
@@ -124,7 +118,6 @@ public class EventServiceImpl implements EventService {
         event.setLocation(update.location());
         event.setTag(update.tag());
         event.setLarkMeetingRoomName(larkMeetingRoomName);
-        event.setLarkDepartmentName(larkDepartmentName);
         event.setCancelled(update.cancelled());
         eventMapper.updateById(event);
         return event;
@@ -133,12 +126,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public Boolean delete(Long eventId) {
         larkEventService.delete(eventMapper.selectById(eventId).getLarkEventUid());
+        subscriptionService.delete(eventId);
         return eventMapper.deleteById(eventId) > 0;
     }
 
     @Override
     public Event cancel(Long eventId) {
         Event event = eventMapper.selectById(eventId);
+        larkEventService.delete(event.getLarkEventUid());
         event.setCancelled(true);
         eventMapper.updateById(event);
         return event;
@@ -173,12 +168,14 @@ public class EventServiceImpl implements EventService {
         queryWrapper.eq(query.tag() != null, "tag", query.tag());
         queryWrapper.eq(query.larkMeetingRoomName() != null, "lark_meeting_room_name", query.larkMeetingRoomName());
         queryWrapper.eq(query.larkDepartmentName() != null, "lark_department_name", query.larkDepartmentName());
-        if (query.participated()) {
-            queryWrapper.in("id", subscriptionService.getParticipatedEvents());
-        }
-        if (query.subscribed()) {
-            queryWrapper.in("id", subscriptionService.getSubscribedEvents());
-        }
+        queryWrapper.exists(query.participated(),
+                "SELECT 1 FROM subscription WHERE subscription.event_id = event.id AND subscription.link_id = " +
+                JWTInterceptor.userHolder.get().getUserId() +
+                " AND subscription.checked_in = true");
+        queryWrapper.exists(query.subscribed(),
+                "SELECT 1 FROM subscription WHERE subscription.event_id = event.id AND subscription.link_id = " +
+                        JWTInterceptor.userHolder.get().getUserId() +
+                        " AND subscription.subscribed = true");
         eventMapper.selectPage(page, queryWrapper);
         return new Pagination<>(page.getRecords(), page.getCurrent(), page.getTotal());
     }

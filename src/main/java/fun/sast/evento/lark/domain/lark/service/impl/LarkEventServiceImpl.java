@@ -114,6 +114,7 @@ public class LarkEventServiceImpl implements LarkEventService {
 
             ListCalendarEventAttendeeResp listCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().list(ListCalendarEventAttendeeReq.newBuilder()
                     .calendarId(calendarId)
+                    .pageSize(100)
                     .eventId(id)
                     .build());
             if (!listCalendarEventAttendeeResp.success()) {
@@ -125,10 +126,6 @@ public class LarkEventServiceImpl implements LarkEventService {
             for (CalendarEventAttendee attendee : listCalendarEventAttendeeResp.getData().getItems()) {
                 if (update.roomId() != null && attendee.getType().equals("resource")) {
                     deleteIds.add(CalendarEventAttendeeId.newBuilder().type("resource").roomId(attendee.getRoomId()).build());
-                }
-
-                if (update.departmentId() != null && attendee.getType().equals("user")) {
-                    deleteIds.add(CalendarEventAttendeeId.newBuilder().type("user").userId(attendee.getUserId()).build());
                 }
             }
             if (!deleteIds.isEmpty()) {
@@ -144,29 +141,18 @@ public class LarkEventServiceImpl implements LarkEventService {
                 }
             }
 
-            List<CalendarEventAttendee> attendees = new ArrayList<>();
             if (update.roomId() != null) {
-                attendees.add(CalendarEventAttendee.newBuilder()
-                        .type("resource")
-                        .roomId(update.roomId())
-                        .build());
-            }
-            if (update.departmentId() != null) {
-                List<String> users = larkDepartmentServiceImpl.getUserList(update.departmentId());
-                for (String user : users) {
-                    attendees.add(CalendarEventAttendee.newBuilder()
-                            .type("user")
-                            .userId(user)
-                            .isOptional(true)
-                            .build());
-                }
-            }
-            if (!attendees.isEmpty()) {
+                CalendarEventAttendee[] attendees = {
+                        CalendarEventAttendee.newBuilder()
+                                .type("resource")
+                                .roomId(update.roomId())
+                                .build()
+                };
                 CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
                         .calendarId(calendarId)
                         .eventId(id)
                         .createCalendarEventAttendeeReqBody(CreateCalendarEventAttendeeReqBody.newBuilder()
-                                .attendees(attendees.toArray(new CalendarEventAttendee[0]))
+                                .attendees(attendees)
                                 .needNotification(true)
                                 .build())
                         .build());

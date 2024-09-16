@@ -7,7 +7,6 @@ public record LarkEventUpdate(
         String description,
         TimeInfo start,
         TimeInfo end,
-        String roomId,
-        String departmentId
+        String roomId
 ) {
 }

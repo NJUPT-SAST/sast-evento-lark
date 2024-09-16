@@ -1,9 +1,5 @@
 package fun.sast.evento.lark.domain.event.service;
 
-import fun.sast.evento.lark.domain.event.entity.Event;
-
-import java.util.List;
-
 public interface SubscriptionService {
 
     String generateCheckInCode(Long eventId);
@@ -18,7 +14,7 @@ public interface SubscriptionService {
 
     Boolean isCheckedIn(Long eventId);
 
-    List<Long> getParticipatedEvents();
+    Boolean isSubscribed(String departmentId);
 
-    List<Long> getSubscribedEvents();
+    Boolean delete(Long eventId);
 }
