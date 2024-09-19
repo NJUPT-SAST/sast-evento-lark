@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
@@ -61,10 +62,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Boolean subscribeEvent(Long eventId, Boolean subscribe) {
+    public Boolean subscribeEvent(Long eventId, String linkId, Boolean subscribe) {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);
-        queryWrapper.eq("link_id", getLinkId());
+        queryWrapper.eq("link_id", linkId == null ? getLinkId() : linkId);
         Subscription subscription = subscriptionMapper.selectOne(queryWrapper);
         if (subscription == null) {
             subscription = new Subscription();
@@ -120,6 +121,24 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         queryWrapper.eq("link_id", getLinkId());
         DepartmentSubscription departmentSubscription = departmentSubscriptionMapper.selectOne(queryWrapper);
         return departmentSubscription != null;
+    }
+
+    @Override
+    public List<String> getSubscribedUsers(Long eventId) {
+        QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("event_id", eventId);
+        queryWrapper.eq("subscribed", true);
+        List<Subscription> subscriptions = subscriptionMapper.selectList(queryWrapper);
+        return subscriptions.stream().map(Subscription::getLinkId).toList();
+    }
+
+    @Override
+    public List<String> getSubscribedUsers(String departmentId) {
+        QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("department_id", departmentId);
+        queryWrapper.eq("subscribed", true);
+        List<Subscription> subscriptions = subscriptionMapper.selectList(queryWrapper);
+        return subscriptions.stream().map(Subscription::getLinkId).toList();
     }
 
     @Override

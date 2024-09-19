@@ -21,10 +21,20 @@ class SubscriptionController {
         if (identifier.matches("\\d+")) {
             Long eventId = Long.parseLong(identifier);
             // 处理活动订阅
-            return subscriptionService.subscribeEvent(eventId, subscribe);
+            return subscriptionService.subscribeEvent(eventId, null, subscribe);
         } else {
             // 处理部门订阅
             return subscriptionService.subscribeDepartment(identifier, subscribe);
+        }
+    }
+
+    @GetMapping("/{identifier}/is-subscribed")
+    Boolean isSubscribed(@PathVariable String identifier) {
+        if (identifier.matches("\\d+")) {
+            Long eventId = Long.parseLong(identifier);
+            return subscriptionService.isSubscribed(eventId);
+        } else {
+            return subscriptionService.isSubscribed(identifier);
         }
     }
 }
