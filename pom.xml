@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>fun.feellmoose</groupId>
-            <artifactId>sast-link-SDK</artifactId>
+            <artifactId>sast-link-sdk</artifactId>
             <version>0.1.2</version>
         </dependency>
         <dependency>
