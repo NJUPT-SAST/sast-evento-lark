@@ -92,9 +92,4 @@ public interface V2 {
     ) {
     }
 
-    record StateUpdateEvent(
-            Long id
-    ) {
-    }
-
 }

@@ -6,17 +6,17 @@ public interface SubscriptionService {
 
     String generateCheckInCode(Long eventId);
 
-    Boolean checkIn(Long eventId, String code);
+    Boolean checkIn(Long eventId, String linkId, String code);
 
     Boolean subscribeEvent(Long eventId, String linkId, Boolean subscribe);
 
-    Boolean subscribeDepartment(String departmentId, Boolean subscribe);
+    Boolean subscribeDepartment(String departmentId, String linkId, Boolean subscribe);
 
-    Boolean isSubscribed(Long eventId);
+    Boolean isSubscribed(Long eventId, String linkId);
 
-    Boolean isCheckedIn(Long eventId);
+    Boolean isCheckedIn(Long eventId, String linkId);
 
-    Boolean isSubscribed(String departmentId);
+    Boolean isSubscribed(String departmentId, String linkId);
 
     List<String> getSubscribedUsers(Long eventId);
 

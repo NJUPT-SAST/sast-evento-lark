@@ -62,11 +62,3 @@ CREATE TABLE `message`
     `time`     DATETIME            NOT NULL,
     PRIMARY KEY (`id`)
 );
-CREATE TABLE `unsent_message`
-(
-    `id`         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `message_id` BIGINT(20)          NOT NULL,
-    `link_id`    VARCHAR(255)        NOT NULL,
-    `state`      VARCHAR(255)        NOT NULL,
-    PRIMARY KEY (`id`)
-);

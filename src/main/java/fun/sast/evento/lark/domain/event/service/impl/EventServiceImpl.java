@@ -17,7 +17,7 @@ import fun.sast.evento.lark.domain.lark.service.LarkEventService;
 import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
 import fun.sast.evento.lark.domain.lark.value.LarkEventCreate;
 import fun.sast.evento.lark.domain.lark.value.LarkEventUpdate;
-import fun.sast.evento.lark.domain.message.service.MessageService;
+import fun.sast.evento.lark.domain.subscription.service.MessageService;
 import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
@@ -212,8 +212,8 @@ public class EventServiceImpl implements EventService {
                 event.getTag(),
                 event.getLarkMeetingRoomName(),
                 event.getLarkDepartmentName(),
-                subscriptionService.isSubscribed(event.getId()),
-                subscriptionService.isCheckedIn(event.getId())
+                subscriptionService.isSubscribed(event.getId(), JWTInterceptor.userHolder.get().getUserId()),
+                subscriptionService.isCheckedIn(event.getId(), JWTInterceptor.userHolder.get().getUserId())
         );
     }
 }

@@ -1,4 +1,4 @@
-package fun.sast.evento.lark.domain.message.entity;
+package fun.sast.evento.lark.domain.subscription.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
