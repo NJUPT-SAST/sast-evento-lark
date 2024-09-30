@@ -46,7 +46,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event create(EventCreate create) {
-        if (!larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
+        if (create.larkMeetingRoomId() != null && !larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
         String larkEventUid = larkEventService.create(new LarkEventCreate(
@@ -63,7 +63,7 @@ public class EventServiceImpl implements EventService {
                 create.larkMeetingRoomId(),
                 create.larkDepartmentId()
         ));
-        String larkMeetingRoomName = larkRoomService.get(create.larkMeetingRoomId()).name();
+        String larkMeetingRoomName = create.larkMeetingRoomId() == null ? null : larkRoomService.get(create.larkMeetingRoomId()).name();
         String larkDepartmentName = larkDepartmentService.get(create.larkDepartmentId()).name();
         LocalDateTime start = create.start();
         LocalDateTime end = create.end();
@@ -83,6 +83,7 @@ public class EventServiceImpl implements EventService {
         event.setLarkDepartmentName(larkDepartmentName);
         eventMapper.insert(event);
         subscriptionService.getSubscribedUsers(create.larkDepartmentId()).forEach(user -> subscriptionService.subscribeEvent(event.getId(), user, true));
+        scheduleStateUpdate(event);
         return event;
     }
 
@@ -122,6 +123,7 @@ public class EventServiceImpl implements EventService {
         event.setLarkMeetingRoomName(larkMeetingRoomName);
         event.setCancelled(update.cancelled());
         eventMapper.updateById(event);
+        scheduleStateUpdate(event);
         return event;
     }
 
@@ -138,6 +140,7 @@ public class EventServiceImpl implements EventService {
         larkEventService.delete(event.getLarkEventUid());
         event.setCancelled(true);
         eventMapper.updateById(event);
+        messageService.schedule(eventId, EventState.CANCELLED, LocalDateTime.now());
         return event;
     }
 
@@ -197,6 +200,12 @@ public class EventServiceImpl implements EventService {
         } else {
             return EventState.ACTIVE;
         }
+    }
+
+    private void scheduleStateUpdate(Event event) {
+        messageService.schedule(event.getId(), EventState.UPCOMING, event.getStart().minusMinutes(30));
+        messageService.schedule(event.getId(), EventState.ACTIVE, event.getStart());
+        messageService.schedule(event.getId(), EventState.COMPLETED, event.getEnd());
     }
 
     @Override

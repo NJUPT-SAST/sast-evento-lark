@@ -3,7 +3,7 @@ package fun.sast.evento.lark.domain.subscription.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.subscription.entity.Message;
-import fun.sast.evento.lark.domain.subscription.event.StateUpdateEvent;
+import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
 import fun.sast.evento.lark.domain.subscription.service.MessageService;
 import fun.sast.evento.lark.infrastructure.repository.MessageMapper;
 import jakarta.annotation.Resource;
@@ -26,12 +26,25 @@ public class MessageServiceImpl implements MessageService {
     private final Map<Long, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
 
     @Resource
-    StateUpdatePublishService stateUpdatePublishService;
+    EventStateUpdatePublishService eventStateUpdatePublishService;
 
     // TODO: 启动时重加载信息
 
     @Override
     public void schedule(Long eventId, EventState state, LocalDateTime time) {
+        if (state == EventState.CANCELLED) {
+            QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("event_id", eventId);
+            messageMapper.selectList(queryWrapper).forEach(message -> {
+                futureMap.computeIfPresent(message.getId(), (k, v) -> {
+                    v.cancel(true);
+                    return null;
+                });
+                messageMapper.deleteById(message.getId());
+            });
+            eventStateUpdatePublishService.publish(new EventStateUpdateEvent(eventId, state, time));
+            return;
+        }
         QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);
         queryWrapper.eq("state", state);
@@ -55,7 +68,7 @@ public class MessageServiceImpl implements MessageService {
         });
 
         ScheduledFuture<?> future = taskScheduler.schedule(() -> {
-            stateUpdatePublishService.publish(new StateUpdateEvent(eventId, state, time));
+            eventStateUpdatePublishService.publish(new EventStateUpdateEvent(eventId, state, time));
             messageMapper.deleteById(messageId);
         }, Instant.from(time));
         futureMap.put(messageId, future);
