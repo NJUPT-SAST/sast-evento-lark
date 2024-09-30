@@ -89,39 +89,38 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event update(Long eventId, EventUpdate update) {
-        // TODO: 只更新非null值
-        if (!larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
+        if (update.larkMeetingRoomId() != null && !larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
-        String larkMeetingRoomName = larkRoomService.get(update.larkMeetingRoomId()).name();
-        LocalDateTime start = update.start();
-        LocalDateTime end = update.end();
+        Event event = eventMapper.selectById(eventId);
+        String larkMeetingRoomName = update.larkMeetingRoomId() == null ? null : larkRoomService.get(update.larkMeetingRoomId()).name();
+        LocalDateTime start = update.start() == null ? event.getStart() : update.start();
+        LocalDateTime end = update.end() == null ? event.getEnd() : update.end();
         if (start.isAfter(end)) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
         }
-        Event event = eventMapper.selectById(eventId);
         larkEventService.update(event.getLarkEventUid(), new LarkEventUpdate(
                 update.summary(),
                 update.description(),
-                TimeInfo.newBuilder()
-                        .timestamp(TimeUtils.toEpochSecond(update.start()))
+                update.start() == null ? null : TimeInfo.newBuilder()
+                        .timestamp(TimeUtils.toEpochSecond(start))
                         .timezone(TimeUtils.zone())
                         .build(),
-                TimeInfo.newBuilder()
-                        .timestamp(TimeUtils.toEpochSecond(update.end()))
+                update.end() == null ? null : TimeInfo.newBuilder()
+                        .timestamp(TimeUtils.toEpochSecond(end))
                         .timezone(TimeUtils.zone())
                         .build(),
                 update.larkMeetingRoomId()
         ));
-        event.setSummary(update.summary());
-        event.setDescription(update.description());
+        if (update.summary() != null) event.setSummary(update.summary());
+        if (update.description() != null) event.setDescription(update.description());
 
-        event.setStart(start);
-        event.setEnd(end);
-        event.setLocation(update.location());
-        event.setTag(update.tag());
-        event.setLarkMeetingRoomName(larkMeetingRoomName);
-        event.setCancelled(update.cancelled());
+        if (update.start() != null) event.setStart(start);
+        if (update.end() != null) event.setEnd(end);
+        if (update.location() != null) event.setLocation(update.location());
+        if (update.tag() != null) event.setTag(update.tag());
+        if (larkMeetingRoomName != null) event.setLarkMeetingRoomName(larkMeetingRoomName);
+        if (update.cancelled() != null) event.setCancelled(update.cancelled());
         eventMapper.updateById(event);
         scheduleStateUpdate(event);
         return event;

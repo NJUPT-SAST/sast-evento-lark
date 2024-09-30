@@ -6,6 +6,7 @@ import fun.sast.evento.lark.domain.subscription.entity.Message;
 import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
 import fun.sast.evento.lark.domain.subscription.service.MessageService;
 import fun.sast.evento.lark.infrastructure.repository.MessageMapper;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,19 @@ public class MessageServiceImpl implements MessageService {
     @Resource
     private TaskScheduler taskScheduler;
     private final Map<Long, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
-
     @Resource
-    EventStateUpdatePublishService eventStateUpdatePublishService;
+    private EventStateUpdatePublishService eventStateUpdatePublishService;
 
-    // TODO: 启动时重加载信息
+    @PostConstruct
+    public void loadData() {
+        messageMapper.selectList(null).forEach(message -> {
+            ScheduledFuture<?> future = taskScheduler.schedule(() -> {
+                eventStateUpdatePublishService.publish(new EventStateUpdateEvent(message.getEventId(), message.getState(), message.getTime()));
+                messageMapper.deleteById(message.getId());
+            }, Instant.from(message.getTime()));
+            futureMap.put(message.getId(), future);
+        });
+    }
 
     @Override
     public void schedule(Long eventId, EventState state, LocalDateTime time) {
