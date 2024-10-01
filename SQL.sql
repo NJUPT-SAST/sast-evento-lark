@@ -35,7 +35,7 @@ CREATE TABLE `subscription`
     `event_id`   BIGINT(20)          NOT NULL,
     `link_id`    VARCHAR(255)        NOT NULL,
     `subscribed` BOOLEAN             NOT NULL,
-    `checked_in`  BOOLEAN             NOT NULL,
+    `checked_in` BOOLEAN             NOT NULL,
     PRIMARY KEY (`id`)
 );
 CREATE TABLE `department_subscription`
@@ -51,5 +51,14 @@ CREATE TABLE `slide`
     `event_id` BIGINT(20)          NOT NULL,
     `url`      VARCHAR(255)        NOT NULL,
     `link`     VARCHAR(255)        NOT NULL,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `message`
+(
+    `id`       BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `event_id` BIGINT(20)          NOT NULL,
+    `state`    VARCHAR(255)        NOT NULL,
+    `time`     DATETIME            NOT NULL,
     PRIMARY KEY (`id`)
 );

@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import fun.sast.evento.lark.domain.event.entity.DepartmentSubscription;
 import fun.sast.evento.lark.domain.event.entity.Subscription;
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
-import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.cache.Cache;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.repository.DepartmentSubscriptionMapper;
@@ -37,7 +36,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Boolean checkIn(Long eventId, String code) {
+    public Boolean checkIn(Long eventId, String linkId, String code) {
         String matchedId = cache.get("CHECKIN_CODE:" + code, String.class);
         if (matchedId == null) {
             throw new BusinessException("checkin-code not exists or has expired.");
@@ -47,98 +46,104 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);
-        queryWrapper.eq("link_id", getLinkId());
+        queryWrapper.eq("link_id", linkId);
         Subscription subscription = subscriptionMapper.selectOne(queryWrapper);
         if (subscription == null) {
             subscription = new Subscription();
             subscription.setEventId(eventId);
-            subscription.setLinkId(JWTInterceptor.userHolder.get().getUserId());
+            subscription.setLinkId(linkId);
             subscription.setCheckedIn(true);
-            subscriptionMapper.insert(subscription);
+            return subscriptionMapper.insert(subscription) > 0;
         } else {
             subscription.setCheckedIn(true);
-            subscriptionMapper.updateById(subscription);
+            return subscriptionMapper.updateById(subscription) > 0;
         }
-        return true;
     }
 
     @Override
-    public Boolean subscribeEvent(Long eventId, Boolean subscribe) {
+    public Boolean subscribeEvent(Long eventId, String linkId, Boolean subscribe) {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);
-        queryWrapper.eq("link_id", getLinkId());
+        queryWrapper.eq("link_id", linkId);
         Subscription subscription = subscriptionMapper.selectOne(queryWrapper);
         if (subscription == null) {
             subscription = new Subscription();
             subscription.setEventId(eventId);
-            subscription.setLinkId(JWTInterceptor.userHolder.get().getUserId());
+            subscription.setLinkId(linkId);
             subscription.setSubscribed(subscribe);
-            subscriptionMapper.insert(subscription);
+            return subscriptionMapper.insert(subscription) > 0;
         } else {
             subscription.setSubscribed(subscribe);
-            subscriptionMapper.updateById(subscription);
+            return subscriptionMapper.updateById(subscription) > 0;
         }
-        return true;
     }
 
     @Override
-    public Boolean subscribeDepartment(String departmentId, Boolean subscribe) {
+    public Boolean subscribeDepartment(String departmentId, String linkId, Boolean subscribe) {
         QueryWrapper<DepartmentSubscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("department_id", departmentId);
-        queryWrapper.eq("link_id", getLinkId());
+        queryWrapper.eq("link_id", linkId);
         DepartmentSubscription departmentSubscription = departmentSubscriptionMapper.selectOne(queryWrapper);
         if (subscribe && departmentSubscription == null) {
             departmentSubscription = new DepartmentSubscription();
             departmentSubscription.setDepartmentId(departmentId);
-            departmentSubscription.setLinkId(JWTInterceptor.userHolder.get().getUserId());
-            departmentSubscriptionMapper.insert(departmentSubscription);
+            departmentSubscription.setLinkId(linkId);
+            return departmentSubscriptionMapper.insert(departmentSubscription) > 0;
         } else if (!subscribe && departmentSubscription != null) {
-            departmentSubscriptionMapper.deleteById(departmentSubscription.getId());
+            return departmentSubscriptionMapper.deleteById(departmentSubscription.getId()) > 0;
         }
-        return true;
+        return false;
     }
 
     @Override
-    public Boolean isSubscribed(Long eventId) {
+    public Boolean isSubscribed(Long eventId, String linkId) {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);
-        queryWrapper.eq("link_id", getLinkId());
+        queryWrapper.eq("link_id", linkId);
         Subscription subscription = subscriptionMapper.selectOne(queryWrapper);
         return subscription != null && subscription.getSubscribed();
     }
 
     @Override
-    public Boolean isCheckedIn(Long eventId) {
+    public Boolean isCheckedIn(Long eventId, String linkId) {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);
-        queryWrapper.eq("link_id", getLinkId());
+        queryWrapper.eq("link_id", linkId);
         Subscription subscription = subscriptionMapper.selectOne(queryWrapper);
         return subscription != null && subscription.getCheckedIn();
     }
 
     @Override
-    public List<Long> getParticipatedEvents() {
-        QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("link_id", getLinkId());
-        queryWrapper.eq("checked_in", true);
-        return subscriptionMapper.selectList(queryWrapper)
-                .stream()
-                .map(Subscription::getEventId)
-                .toList();
+    public Boolean isSubscribed(String departmentId, String linkId) {
+        QueryWrapper<DepartmentSubscription> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("department_id", departmentId);
+        queryWrapper.eq("link_id", linkId);
+        DepartmentSubscription departmentSubscription = departmentSubscriptionMapper.selectOne(queryWrapper);
+        return departmentSubscription != null;
     }
 
     @Override
-    public List<Long> getSubscribedEvents() {
+    public List<String> getSubscribedUsers(Long eventId) {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("link_id", getLinkId());
+        queryWrapper.eq("event_id", eventId);
         queryWrapper.eq("subscribed", true);
-        return subscriptionMapper.selectList(queryWrapper)
-                .stream()
-                .map(Subscription::getEventId)
-                .toList();
+        List<Subscription> subscriptions = subscriptionMapper.selectList(queryWrapper);
+        return subscriptions.stream().map(Subscription::getLinkId).toList();
     }
 
-    private String getLinkId() {
-        return JWTInterceptor.userHolder.get().getUserId();
+    @Override
+    public List<String> getSubscribedUsers(String departmentId) {
+        QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("department_id", departmentId);
+        queryWrapper.eq("subscribed", true);
+        List<Subscription> subscriptions = subscriptionMapper.selectList(queryWrapper);
+        return subscriptions.stream().map(Subscription::getLinkId).toList();
+    }
+
+    @Override
+    public Boolean delete(Long eventId) {
+        QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("event_id", eventId);
+        return subscriptionMapper.delete(queryWrapper) > 0;
     }
 }

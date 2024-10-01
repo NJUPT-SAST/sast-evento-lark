@@ -112,61 +112,50 @@ public class LarkEventServiceImpl implements LarkEventService {
                 throw new BusinessException(ErrorEnum.LARK_ERROR, patchCalendarEventResp.getMsg());
             }
 
-            ListCalendarEventAttendeeResp listCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().list(ListCalendarEventAttendeeReq.newBuilder()
-                    .calendarId(calendarId)
-                    .eventId(id)
-                    .build());
-            if (!listCalendarEventAttendeeResp.success()) {
-                throw new BusinessException(ErrorEnum.LARK_ERROR, listCalendarEventAttendeeResp.getMsg());
-            }
-            // Shouldn't have more pages
-            List<CalendarEventAttendeeId> deleteIds = new ArrayList<>();
-
-            for (CalendarEventAttendee attendee : listCalendarEventAttendeeResp.getData().getItems()) {
-                if (update.roomId() != null && attendee.getType().equals("resource")) {
-                    deleteIds.add(CalendarEventAttendeeId.newBuilder().type("resource").roomId(attendee.getRoomId()).build());
-                }
-
-                if (update.departmentId() != null && attendee.getType().equals("user")) {
-                    deleteIds.add(CalendarEventAttendeeId.newBuilder().type("user").userId(attendee.getUserId()).build());
-                }
-            }
-            if (!deleteIds.isEmpty()) {
-                BatchDeleteCalendarEventAttendeeResp batchDeleteCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().batchDelete(BatchDeleteCalendarEventAttendeeReq.newBuilder()
-                        .calendarId(calendarId)
-                        .eventId(id)
-                        .batchDeleteCalendarEventAttendeeReqBody(BatchDeleteCalendarEventAttendeeReqBody.newBuilder()
-                                .deleteIds(deleteIds.toArray(new CalendarEventAttendeeId[0]))
-                                .build())
-                        .build());
-                if (!batchDeleteCalendarEventAttendeeResp.success()) {
-                    throw new BusinessException(ErrorEnum.LARK_ERROR, batchDeleteCalendarEventAttendeeResp.getMsg());
-                }
-            }
-
-            List<CalendarEventAttendee> attendees = new ArrayList<>();
             if (update.roomId() != null) {
-                attendees.add(CalendarEventAttendee.newBuilder()
-                        .type("resource")
-                        .roomId(update.roomId())
+                // Get the old meeting room
+                ListCalendarEventAttendeeResp listCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().list(ListCalendarEventAttendeeReq.newBuilder()
+                        .calendarId(calendarId)
+                        .pageSize(100)
+                        .eventId(id)
                         .build());
-            }
-            if (update.departmentId() != null) {
-                List<String> users = larkDepartmentServiceImpl.getUserList(update.departmentId());
-                for (String user : users) {
-                    attendees.add(CalendarEventAttendee.newBuilder()
-                            .type("user")
-                            .userId(user)
-                            .isOptional(true)
-                            .build());
+                if (!listCalendarEventAttendeeResp.success()) {
+                    throw new BusinessException(ErrorEnum.LARK_ERROR, listCalendarEventAttendeeResp.getMsg());
                 }
-            }
-            if (!attendees.isEmpty()) {
+                // Shouldn't have more pages
+                List<CalendarEventAttendeeId> deleteIds = new ArrayList<>();
+
+                for (CalendarEventAttendee attendee : listCalendarEventAttendeeResp.getData().getItems()) {
+                    if (attendee.getType().equals("resource")) {
+                        deleteIds.add(CalendarEventAttendeeId.newBuilder().type("resource").roomId(attendee.getRoomId()).build());
+                    }
+                }
+                if (!deleteIds.isEmpty()) {
+                    // delete the old meeting room
+                    BatchDeleteCalendarEventAttendeeResp batchDeleteCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().batchDelete(BatchDeleteCalendarEventAttendeeReq.newBuilder()
+                            .calendarId(calendarId)
+                            .eventId(id)
+                            .batchDeleteCalendarEventAttendeeReqBody(BatchDeleteCalendarEventAttendeeReqBody.newBuilder()
+                                    .deleteIds(deleteIds.toArray(new CalendarEventAttendeeId[0]))
+                                    .build())
+                            .build());
+                    if (!batchDeleteCalendarEventAttendeeResp.success()) {
+                        throw new BusinessException(ErrorEnum.LARK_ERROR, batchDeleteCalendarEventAttendeeResp.getMsg());
+                    }
+                }
+
+                // add the new meeting room
+                CalendarEventAttendee[] attendees = {
+                        CalendarEventAttendee.newBuilder()
+                                .type("resource")
+                                .roomId(update.roomId())
+                                .build()
+                };
                 CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
                         .calendarId(calendarId)
                         .eventId(id)
                         .createCalendarEventAttendeeReqBody(CreateCalendarEventAttendeeReqBody.newBuilder()
-                                .attendees(attendees.toArray(new CalendarEventAttendee[0]))
+                                .attendees(attendees)
                                 .needNotification(true)
                                 .build())
                         .build());

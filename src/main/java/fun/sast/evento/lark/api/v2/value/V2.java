@@ -49,7 +49,6 @@ public interface V2 {
             String location,
             String tag,
             String larkMeetingRoomId,
-            String larkDepartmentId,
             Boolean cancelled
     ) {
     }
