@@ -4,6 +4,7 @@ import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.event.entity.Slide;
 import fun.sast.evento.lark.domain.event.service.SlideService;
 import jakarta.annotation.Resource;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +20,15 @@ class SlideController {
     SlideService slideService;
 
     @GetMapping("/slide")
-    List<V2.Slide> getSlides() {
+    @Cacheable(cacheNames = "slides", key = "root")
+    public List<V2.Slide> getSlides() {
         List<Slide> slides = slideService.getSlides();
         return slides.stream().map(slideService::mapToV2Slide).toList();
     }
 
     @GetMapping("/{eventId}/slide")
-    List<V2.Slide> getSlides(@PathVariable Long eventId) {
+    @Cacheable(cacheNames = "slides", key = "#eventId")
+    public List<V2.Slide> getSlides(@PathVariable Long eventId) {
         List<Slide> slides = slideService.getSlides(eventId);
         return slides.stream().map(slideService::mapToV2Slide).toList();
     }

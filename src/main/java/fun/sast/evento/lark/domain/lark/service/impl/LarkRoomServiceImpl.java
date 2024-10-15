@@ -16,6 +16,7 @@ import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.lark.OApi;
 import fun.sast.evento.lark.infrastructure.utils.TimeUtils;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Service
 public class LarkRoomServiceImpl implements LarkRoomService {
 
@@ -43,6 +45,7 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                         .pageToken(pageToken)
                         .build());
                 if (!resp.success()) {
+                    log.error("failed to list room: {}", resp.getMsg());
                     throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
                 }
                 if (resp.getData().getRooms() != null) {
@@ -57,6 +60,7 @@ public class LarkRoomServiceImpl implements LarkRoomService {
             } while (hasMore);
             return larkRooms;
         } catch (Exception e) {
+            log.error("list room error", e);
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
     }
@@ -68,6 +72,7 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                     .roomId(id)
                     .build());
             if (!resp.success()) {
+                log.error("failed to get room: {}", resp.getMsg());
                 throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
             }
             return new LarkRoom(
@@ -76,6 +81,7 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                     resp.getData().getRoom().getCapacity()
             );
         } catch (Exception e) {
+            log.error("get room error", e);
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
     }
@@ -97,10 +103,12 @@ public class LarkRoomServiceImpl implements LarkRoomService {
             if ("success".equals(msg)) {
                 return node.get("data").get("free_busy").isEmpty();
             } else {
+                log.error("failed to check room availability: {}", msg);
                 throw new BusinessException(ErrorEnum.LARK_ERROR, msg);
 
             }
         } catch (Exception e) {
+            log.error("check room availability error", e);
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
     }

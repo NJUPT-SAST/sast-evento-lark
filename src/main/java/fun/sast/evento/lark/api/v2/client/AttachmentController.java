@@ -3,6 +3,7 @@ package fun.sast.evento.lark.api.v2.client;
 import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.event.service.AttachmentService;
 import jakarta.annotation.Resource;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,8 @@ class AttachmentController {
     AttachmentService attachmentService;
 
     @GetMapping("/{eventId}/attachment")
-    List<V2.Attachment> getAttachments(@PathVariable Long eventId) {
+    @Cacheable(cacheNames = "attachments", key = "#eventId")
+    public List<V2.Attachment> getAttachments(@PathVariable Long eventId) {
         return attachmentService.getAttachments(eventId).stream().map(attachmentService::mapToV2).toList();
     }
 }

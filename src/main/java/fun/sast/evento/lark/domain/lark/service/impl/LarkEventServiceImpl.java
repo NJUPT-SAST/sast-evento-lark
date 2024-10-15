@@ -8,12 +8,14 @@ import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.lark.OApi;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class LarkEventServiceImpl implements LarkEventService {
 
@@ -39,6 +41,7 @@ public class LarkEventServiceImpl implements LarkEventService {
                     .calendarEvent(calendarEvent)
                     .build());
             if (!createCalendarEventResp.success()) {
+                log.error("failed to create event: {}", createCalendarEventResp.getMsg());
                 throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventResp.getMsg());
             }
             String id = createCalendarEventResp.getData().getEvent().getEventId();
@@ -70,11 +73,14 @@ public class LarkEventServiceImpl implements LarkEventService {
                             .build())
                     .build());
             if (!createCalendarEventAttendeeResp.success()) {
+                // TODO: delete the event
+                log.error("failed to create event attendee: {}", createCalendarEventAttendeeResp.getMsg());
                 throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
             }
 
             return id;
         } catch (Exception e) {
+            log.error("create event error: {}", e.getMessage());
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
     }
@@ -86,8 +92,13 @@ public class LarkEventServiceImpl implements LarkEventService {
                     .calendarId(calendarId)
                     .eventId(id)
                     .build());
+            if (!resp.success()) {
+                log.error("failed to get event: {}", resp.getMsg());
+                throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
+            }
             return resp.getData().getEvent();
         } catch (Exception e) {
+            log.error("get event error: {}", e.getMessage());
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
     }
@@ -109,6 +120,7 @@ public class LarkEventServiceImpl implements LarkEventService {
                     .calendarEvent(event)
                     .build());
             if (!patchCalendarEventResp.success()) {
+                log.error("failed to update event: {}", patchCalendarEventResp.getMsg());
                 throw new BusinessException(ErrorEnum.LARK_ERROR, patchCalendarEventResp.getMsg());
             }
 
@@ -120,6 +132,7 @@ public class LarkEventServiceImpl implements LarkEventService {
                         .eventId(id)
                         .build());
                 if (!listCalendarEventAttendeeResp.success()) {
+                    log.error("failed to list event attendee: {}", listCalendarEventAttendeeResp.getMsg());
                     throw new BusinessException(ErrorEnum.LARK_ERROR, listCalendarEventAttendeeResp.getMsg());
                 }
                 // Shouldn't have more pages
@@ -140,6 +153,7 @@ public class LarkEventServiceImpl implements LarkEventService {
                                     .build())
                             .build());
                     if (!batchDeleteCalendarEventAttendeeResp.success()) {
+                        log.error("failed to delete old event attendee: {}", batchDeleteCalendarEventAttendeeResp.getMsg());
                         throw new BusinessException(ErrorEnum.LARK_ERROR, batchDeleteCalendarEventAttendeeResp.getMsg());
                     }
                 }
@@ -160,10 +174,12 @@ public class LarkEventServiceImpl implements LarkEventService {
                                 .build())
                         .build());
                 if (!createCalendarEventAttendeeResp.success()) {
+                    log.error("failed to create new event attendee: {}", createCalendarEventAttendeeResp.getMsg());
                     throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
                 }
             }
         } catch (Exception e) {
+            log.error("update event error: {}", e.getMessage());
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
     }
@@ -176,9 +192,11 @@ public class LarkEventServiceImpl implements LarkEventService {
                     .eventId(id)
                     .build());
             if (!resp.success()) {
+                log.error("failed to delete event: {}", resp.getMsg());
                 throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
             }
         } catch (Exception e) {
+            log.error("delete event error: {}", e.getMessage());
             throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
         }
     }
