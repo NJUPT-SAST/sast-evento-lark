@@ -128,7 +128,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Boolean delete(Long eventId) {
-        larkEventService.delete(eventMapper.selectById(eventId).getLarkEventUid());
+        Event event = eventMapper.selectById(eventId);
+        if (event == null) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "event not found");
+        }
+        larkEventService.delete(event.getLarkEventUid());
         subscriptionService.delete(eventId);
         return eventMapper.deleteById(eventId) > 0;
     }
@@ -172,11 +176,11 @@ public class EventServiceImpl implements EventService {
         queryWrapper.eq(query.tag() != null, "tag", query.tag());
         queryWrapper.eq(query.larkMeetingRoomName() != null, "lark_meeting_room_name", query.larkMeetingRoomName());
         queryWrapper.eq(query.larkDepartmentName() != null, "lark_department_name", query.larkDepartmentName());
-        queryWrapper.exists(query.participated(),
+        queryWrapper.exists(Boolean.TRUE.equals(query.participated()),
                 "SELECT 1 FROM subscription WHERE subscription.event_id = event.id AND subscription.link_id = " +
                         JWTInterceptor.userHolder.get().getUserId() +
                         " AND subscription.checked_in = true");
-        queryWrapper.exists(query.subscribed(),
+        queryWrapper.exists(Boolean.TRUE.equals(query.subscribed()),
                 "SELECT 1 FROM subscription WHERE subscription.event_id = event.id AND subscription.link_id = " +
                         JWTInterceptor.userHolder.get().getUserId() +
                         " AND subscription.subscribed = true");

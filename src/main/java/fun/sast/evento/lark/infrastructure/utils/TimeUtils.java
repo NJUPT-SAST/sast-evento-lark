@@ -2,6 +2,7 @@ package fun.sast.evento.lark.infrastructure.utils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class TimeUtils {
@@ -19,5 +20,9 @@ public class TimeUtils {
 
     public static String zone() {
         return ZONE.toString();
+    }
+
+    public static ZonedDateTime zone(LocalDateTime time) {
+        return time.atZone(ZONE);
     }
 }

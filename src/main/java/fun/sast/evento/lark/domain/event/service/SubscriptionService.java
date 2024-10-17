@@ -1,5 +1,9 @@
 package fun.sast.evento.lark.domain.event.service;
 
+import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
+import org.springframework.http.codec.ServerSentEvent;
+import reactor.core.publisher.Flux;
+
 import java.util.List;
 
 public interface SubscriptionService {
@@ -23,4 +27,6 @@ public interface SubscriptionService {
     List<String> getSubscribedUsers(String departmentId);
 
     Boolean delete(Long eventId);
+
+    Flux<ServerSentEvent<EventStateUpdateEvent>> subscription(String linkId);
 }

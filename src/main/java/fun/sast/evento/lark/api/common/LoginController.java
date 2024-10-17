@@ -32,7 +32,7 @@ class LoginController {
         UserInfo userInfo = sastLinkService.user(accessToken.getAccessToken());
         User user = userService.getUser(userInfo);
         cache.set(user.getUserId(), user);
-        String token = jwtService.generate(new JWTService.Payload<>(user.getUserId()));
+        String token = jwtService.generate(new JWTService.Payload<>(user));
         return new Login(token, user);
     }
 

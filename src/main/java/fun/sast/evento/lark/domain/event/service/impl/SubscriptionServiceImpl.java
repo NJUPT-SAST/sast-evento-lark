@@ -4,12 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import fun.sast.evento.lark.domain.event.entity.DepartmentSubscription;
 import fun.sast.evento.lark.domain.event.entity.Subscription;
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
+import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
+import fun.sast.evento.lark.domain.subscription.service.impl.EventStateUpdatePublishService;
 import fun.sast.evento.lark.infrastructure.cache.Cache;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.repository.DepartmentSubscriptionMapper;
 import fun.sast.evento.lark.infrastructure.repository.SubscriptionMapper;
 import jakarta.annotation.Resource;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -24,6 +28,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private DepartmentSubscriptionMapper departmentSubscriptionMapper;
     @Resource
     private Cache cache;
+    @Resource
+    private EventStateUpdatePublishService eventStateUpdatePublishService;
 
     @Override
     public String generateCheckInCode(Long eventId) {
@@ -133,11 +139,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public List<String> getSubscribedUsers(String departmentId) {
-        QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<DepartmentSubscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("department_id", departmentId);
-        queryWrapper.eq("subscribed", true);
-        List<Subscription> subscriptions = subscriptionMapper.selectList(queryWrapper);
-        return subscriptions.stream().map(Subscription::getLinkId).toList();
+        List<DepartmentSubscription> subscriptions = departmentSubscriptionMapper.selectList(queryWrapper);
+        return subscriptions.stream().map(DepartmentSubscription::getLinkId).toList();
     }
 
     @Override
@@ -145,5 +150,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);
         return subscriptionMapper.delete(queryWrapper) > 0;
+    }
+
+    @Override
+    public Flux<ServerSentEvent<EventStateUpdateEvent>> subscription(String linkId) {
+        return eventStateUpdatePublishService.subscribe()
+                .filter(event -> isSubscribed(event.eventId(), linkId))
+                .map(event -> ServerSentEvent.builder(event).build());
     }
 }

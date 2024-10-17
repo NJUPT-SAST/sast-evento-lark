@@ -11,8 +11,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 
 @Component
 public class JWTService {
@@ -34,14 +33,13 @@ public class JWTService {
     @SneakyThrows
     public String generate(Payload<?> payload) {
         return JWT.create().withPayload(objectMapper.writeValueAsString(payload))
-                .withExpiresAt(Instant.now().plus(expire, ChronoUnit.MILLIS))
                 .sign(algorithm);
     }
 
     @SneakyThrows
     public <T> T verify(String token, TypeReference<Payload<T>> typeReference) throws JWTVerificationException {
-        final DecodedJWT decodedJWT = verifier.verify(token);
-        return objectMapper.readValue(decodedJWT.getPayload(), typeReference).value;
+        DecodedJWT decodedJWT = verifier.verify(token);
+        String payload = new String(Base64.getDecoder().decode(decodedJWT.getPayload()));
+        return objectMapper.readValue(payload, typeReference).value;
     }
-
 }

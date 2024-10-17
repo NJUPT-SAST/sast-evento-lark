@@ -1,9 +1,12 @@
 package fun.sast.evento.lark.api.v2.client;
 
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
+import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
 import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import jakarta.annotation.Resource;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/api/v2/client/event")
@@ -37,5 +40,10 @@ class SubscriptionController {
         } else {
             return subscriptionService.isSubscribed(identifier, JWTInterceptor.userHolder.get().getUserId());
         }
+    }
+
+    @GetMapping("/subscription")
+    Flux<ServerSentEvent<EventStateUpdateEvent>> subscription() {
+        return subscriptionService.subscription(JWTInterceptor.userHolder.get().getUserId());
     }
 }

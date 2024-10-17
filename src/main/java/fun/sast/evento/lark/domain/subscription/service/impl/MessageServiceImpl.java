@@ -6,6 +6,7 @@ import fun.sast.evento.lark.domain.subscription.entity.Message;
 import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
 import fun.sast.evento.lark.domain.subscription.service.MessageService;
 import fun.sast.evento.lark.infrastructure.repository.MessageMapper;
+import fun.sast.evento.lark.infrastructure.utils.TimeUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -34,7 +35,7 @@ public class MessageServiceImpl implements MessageService {
             ScheduledFuture<?> future = taskScheduler.schedule(() -> {
                 eventStateUpdatePublishService.publish(new EventStateUpdateEvent(message.getEventId(), message.getState(), message.getTime()));
                 messageMapper.deleteById(message.getId());
-            }, Instant.from(message.getTime()));
+            }, Instant.from(TimeUtils.zone(message.getTime())));
             futureMap.put(message.getId(), future);
         });
     }
@@ -79,7 +80,7 @@ public class MessageServiceImpl implements MessageService {
         ScheduledFuture<?> future = taskScheduler.schedule(() -> {
             eventStateUpdatePublishService.publish(new EventStateUpdateEvent(eventId, state, time));
             messageMapper.deleteById(messageId);
-        }, Instant.from(time));
+        }, Instant.from(TimeUtils.zone(time)));
         futureMap.put(messageId, future);
     }
 }
