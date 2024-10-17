@@ -62,3 +62,9 @@ CREATE TABLE `message`
     `time`     DATETIME            NOT NULL,
     PRIMARY KEY (`id`)
 );
+CREATE TABLE 'permission'
+(
+    'user_id'    VARCHAR(255) NOT NULL,
+    'permission' INT,
+    PRIMARY KEY ('user_id')
+);

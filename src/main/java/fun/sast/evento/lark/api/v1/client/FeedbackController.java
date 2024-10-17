@@ -1,7 +1,6 @@
 package fun.sast.evento.lark.api.v1.client;
 
 import fun.sast.evento.lark.api.v1.value.V1;
-import fun.sast.evento.lark.domain.common.value.Pagination;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

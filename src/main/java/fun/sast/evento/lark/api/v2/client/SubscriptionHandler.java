@@ -1,7 +1,7 @@
 package fun.sast.evento.lark.api.v2.client;
 
+import fun.sast.evento.lark.domain.event.entity.User;
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
-import fun.sast.evento.lark.domain.link.value.User;
 import fun.sast.evento.lark.domain.subscription.service.impl.EventStateUpdatePublishService;
 import fun.sast.evento.lark.infrastructure.utils.JsonUtils;
 import jakarta.annotation.Resource;

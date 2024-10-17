@@ -13,7 +13,6 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URL;
 import java.util.List;
 
 @Service

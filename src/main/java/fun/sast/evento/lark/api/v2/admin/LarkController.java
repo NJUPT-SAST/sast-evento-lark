@@ -1,5 +1,7 @@
 package fun.sast.evento.lark.api.v2.admin;
 
+import fun.sast.evento.lark.api.security.Permission;
+import fun.sast.evento.lark.api.security.RequirePermission;
 import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
@@ -21,6 +23,7 @@ class LarkController {
 
     @GetMapping("/department")
     @Cacheable("lark-department")
+    @RequirePermission(Permission.MANAGER)
     public List<V2.Department> getAllDepartments() {
         return larkDepartmentService.list().stream()
                 .map(larkDepartmentService::mapToV2)
@@ -29,6 +32,7 @@ class LarkController {
 
     @GetMapping("/meeting-room")
     @Cacheable("lark-room")
+    @RequirePermission(Permission.MANAGER)
     public List<V2.Room> getAllMeetingRooms() {
         return larkRoomService.list().stream()
                 .map(larkRoomService::mapToV2)
@@ -36,6 +40,7 @@ class LarkController {
     }
 
     @GetMapping("/meeting-room/{roomId}/available")
+    @RequirePermission(Permission.MANAGER)
     public Boolean isAvailable(@PathVariable String roomId, @RequestParam LocalDateTime start, @RequestParam LocalDateTime end) {
         return larkRoomService.isAvailable(roomId, start, end);
     }

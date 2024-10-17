@@ -21,7 +21,7 @@ class SlideController {
 
     @GetMapping("/home/list")
     public V1.SlidePage home(@RequestParam(defaultValue = "1", required = false) Integer current,
-                                      @RequestParam(defaultValue = "3", required = false) Integer size) {
+                             @RequestParam(defaultValue = "3", required = false) Integer size) {
         return new V1.SlidePage(List.of(), 0);
     }
 

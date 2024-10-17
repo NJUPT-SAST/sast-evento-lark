@@ -6,6 +6,8 @@ import java.net.URL;
 
 public interface OSS {
     String upload(MultipartFile file);
+
     void delete(String key);
+
     URL url(String key);
 }

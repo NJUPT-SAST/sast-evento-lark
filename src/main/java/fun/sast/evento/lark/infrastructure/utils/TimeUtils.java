@@ -17,7 +17,7 @@ public class TimeUtils {
         return localDateTime.atZone(ZONE).format(RFC3339);
     }
 
-    public static String zone(){
+    public static String zone() {
         return ZONE.toString();
     }
 }

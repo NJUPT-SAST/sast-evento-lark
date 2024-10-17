@@ -19,7 +19,7 @@ class FeedbackController {
     @GetMapping("/{eventId}/feedback")
     V2.Feedback getFeedback(@PathVariable Long eventId) {
         Feedback feedback = feedbackService.getFeedback(eventId);
-        if(feedback == null){
+        if (feedback == null) {
             return null;
         }
         return feedbackService.mapToV2(feedback);
@@ -27,8 +27,8 @@ class FeedbackController {
 
     @PostMapping("/{eventId}/feedback")
     V2.Feedback createFeedback(@PathVariable Long eventId,
-                                      @RequestParam Integer rating,
-                                      @RequestParam String content) {
+                               @RequestParam Integer rating,
+                               @RequestParam String content) {
         Feedback feedback = feedbackService.createFeedback(eventId, rating, content);
         return feedbackService.mapToV2(feedback);
     }

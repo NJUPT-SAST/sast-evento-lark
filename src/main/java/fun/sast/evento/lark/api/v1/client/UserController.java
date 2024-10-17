@@ -1,7 +1,7 @@
 package fun.sast.evento.lark.api.v1.client;
 
 import fun.sast.evento.lark.api.v1.value.V1;
-import fun.sast.evento.lark.domain.link.value.User;
+import fun.sast.evento.lark.domain.event.entity.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +32,7 @@ class UserController {
 
     @GetMapping("/register")
     public Boolean register(@RequestParam Integer eventId,
-                           @RequestParam Boolean isRegister) {
+                            @RequestParam Boolean isRegister) {
         return true;
     }
 

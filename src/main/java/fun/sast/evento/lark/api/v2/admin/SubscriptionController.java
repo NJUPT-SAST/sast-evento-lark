@@ -1,5 +1,7 @@
 package fun.sast.evento.lark.api.v2.admin;
 
+import fun.sast.evento.lark.api.security.Permission;
+import fun.sast.evento.lark.api.security.RequirePermission;
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +17,7 @@ class SubscriptionController {
     SubscriptionService subscriptionService;
 
     @PostMapping("/{eventId}/code")
+    @RequirePermission(Permission.MANAGER)
     String generateCheckInCode(@PathVariable Long eventId) {
         return subscriptionService.generateCheckInCode(eventId);
     }

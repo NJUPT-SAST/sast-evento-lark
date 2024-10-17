@@ -1,5 +1,7 @@
 package fun.sast.evento.lark.api.v2.admin;
 
+import fun.sast.evento.lark.api.security.Permission;
+import fun.sast.evento.lark.api.security.RequirePermission;
 import fun.sast.evento.lark.api.v2.value.V2;
 import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.service.EventService;
@@ -16,6 +18,7 @@ class EventController {
     EventService eventService;
 
     @PostMapping("/create")
+    @RequirePermission(Permission.MANAGER)
     V2.Event createEvent(@RequestBody V2.CreateEventRequest request) {
         EventCreate eventCreate = new EventCreate(
                 request.summary(),
@@ -32,11 +35,13 @@ class EventController {
     }
 
     @DeleteMapping("/{eventId}/delete")
+    @RequirePermission(Permission.MANAGER)
     Boolean deleteEvent(@PathVariable Long eventId) {
         return eventService.delete(eventId);
     }
 
     @PutMapping("/{eventId}/update")
+    @RequirePermission(Permission.MANAGER)
     V2.Event updateEvent(@PathVariable Long eventId, @RequestBody V2.UpdateEventRequest request) {
         EventUpdate eventUpdate = new EventUpdate(
                 request.summary(),
@@ -53,6 +58,7 @@ class EventController {
     }
 
     @PostMapping("/{eventId}/cancel")
+    @RequirePermission(Permission.MANAGER)
     V2.Event cancelEvent(@PathVariable Long eventId) {
         Event event = eventService.cancel(eventId);
         return eventService.mapToV2(event);

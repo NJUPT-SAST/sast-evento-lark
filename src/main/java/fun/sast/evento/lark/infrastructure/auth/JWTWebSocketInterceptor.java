@@ -1,7 +1,7 @@
 package fun.sast.evento.lark.infrastructure.auth;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import fun.sast.evento.lark.domain.link.value.User;
+import fun.sast.evento.lark.domain.event.entity.User;
 import jakarta.annotation.Resource;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;

@@ -9,14 +9,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 @Component
-@ConditionalOnProperty(prefix = "app.auth.jwt", name = {"secret", "expire"})
 public class JWTService {
     private final ObjectMapper objectMapper;
     private final Algorithm algorithm;
