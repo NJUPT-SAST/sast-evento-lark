@@ -1,6 +1,6 @@
-package fun.sast.evento.lark.api.v2.client;
+package fun.sast.evento.lark.api.client;
 
-import fun.sast.evento.lark.api.v2.value.V2;
+import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.event.service.AttachmentService;
 import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.Cacheable;

@@ -8,7 +8,7 @@ import com.lark.oapi.service.vc.v1.model.GetRoomReq;
 import com.lark.oapi.service.vc.v1.model.GetRoomResp;
 import com.lark.oapi.service.vc.v1.model.ListRoomReq;
 import com.lark.oapi.service.vc.v1.model.ListRoomResp;
-import fun.sast.evento.lark.api.v2.value.V2;
+import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
 import fun.sast.evento.lark.domain.lark.value.LarkRoom;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;

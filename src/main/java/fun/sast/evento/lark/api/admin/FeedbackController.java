@@ -1,8 +1,8 @@
-package fun.sast.evento.lark.api.v2.admin;
+package fun.sast.evento.lark.api.admin;
 
 import fun.sast.evento.lark.api.security.Permission;
 import fun.sast.evento.lark.api.security.RequirePermission;
-import fun.sast.evento.lark.api.v2.value.V2;
+import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Feedback;
 import fun.sast.evento.lark.domain.event.service.FeedbackService;

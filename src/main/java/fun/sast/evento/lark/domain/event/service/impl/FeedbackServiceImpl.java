@@ -2,7 +2,7 @@ package fun.sast.evento.lark.domain.event.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import fun.sast.evento.lark.api.v2.value.V2;
+import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Feedback;
 import fun.sast.evento.lark.domain.event.service.FeedbackService;

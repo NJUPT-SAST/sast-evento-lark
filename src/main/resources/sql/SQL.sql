@@ -63,7 +63,7 @@ CREATE TABLE `message`
 );
 CREATE TABLE `permission`
 (
-    'user_id'    VARCHAR(16) NOT NULL,
-    'permission' INT,
-    PRIMARY KEY ('user_id')
+    `user_id`    VARCHAR(16) NOT NULL,
+    `permission` INT,
+    PRIMARY KEY (`user_id`)
 );

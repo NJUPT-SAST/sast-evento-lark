@@ -1,7 +1,7 @@
 package fun.sast.evento.lark.domain.lark.service.impl;
 
 import com.lark.oapi.service.contact.v3.model.*;
-import fun.sast.evento.lark.api.v2.value.V2;
+import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.value.LarkDepartment;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;

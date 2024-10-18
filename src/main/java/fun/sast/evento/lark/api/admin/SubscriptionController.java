@@ -1,4 +1,4 @@
-package fun.sast.evento.lark.api.v2.admin;
+package fun.sast.evento.lark.api.admin;
 
 import fun.sast.evento.lark.api.security.Permission;
 import fun.sast.evento.lark.api.security.RequirePermission;

@@ -1,4 +1,4 @@
-package fun.sast.evento.lark.api.v2.client;
+package fun.sast.evento.lark.api.client;
 
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
 import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;

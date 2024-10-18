@@ -1,4 +1,4 @@
-package fun.sast.evento.lark.api.v2.value;
+package fun.sast.evento.lark.api.value;
 
 import fun.sast.evento.lark.domain.common.value.EventState;
 

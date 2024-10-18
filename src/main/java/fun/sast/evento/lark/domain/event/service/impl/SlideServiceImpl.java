@@ -1,7 +1,7 @@
 package fun.sast.evento.lark.domain.event.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import fun.sast.evento.lark.api.v2.value.V2;
+import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.event.entity.Slide;
 import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.service.SlideService;
