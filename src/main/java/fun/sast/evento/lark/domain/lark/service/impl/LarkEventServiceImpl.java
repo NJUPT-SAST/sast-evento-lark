@@ -73,7 +73,7 @@ public class LarkEventServiceImpl implements LarkEventService {
                             .build())
                     .build());
             if (!createCalendarEventAttendeeResp.success()) {
-                // TODO: delete the event
+                delete(id);
                 log.error("failed to create event attendee: {}", createCalendarEventAttendeeResp.getMsg());
                 throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
             }
