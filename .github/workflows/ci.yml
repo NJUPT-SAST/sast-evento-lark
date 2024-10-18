@@ -36,4 +36,4 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: evento
           SOURCE: evento-lark.jar
-          TARGET: /
+          TARGET: /home/evento
