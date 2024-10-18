@@ -15,6 +15,10 @@ public record GlobalResult<T>(boolean success, int errCode, String errMsg, T dat
         return new GlobalResult<>(false, reason.getCode(), exception.getMessage(), null);
     }
 
+    public static <T> GlobalResult<T> failure(RuntimeException exception) {
+        return new GlobalResult<>(false, 500, exception.getMessage(), null);
+    }
+
     public static <T> GlobalResult<T> failure(HttpStatusCodeException httpStatusCodeException) {
         final int code = httpStatusCodeException.getStatusCode().value();
         return new GlobalResult<>(false, code, httpStatusCodeException.getMessage(), null);

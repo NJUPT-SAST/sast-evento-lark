@@ -25,8 +25,7 @@ public class JWTInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            return false;
+            throw new BusinessException("Please login first.");
         }
         User user = jwtService.verify(token.substring(7), new TypeReference<>() {
         });

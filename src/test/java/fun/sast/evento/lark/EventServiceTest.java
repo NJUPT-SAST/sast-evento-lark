@@ -86,7 +86,7 @@ public class EventServiceTest {
     @Test
     void admin() {
         User user = new User();
-        user.setUserId("123");
+        user.setUserId("B23051508");
         user.setPermission(2);
         JWTInterceptor.userHolder.set(user);
         System.out.println(jwtService.generate(new JWTService.Payload<>(user)));

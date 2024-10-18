@@ -3,7 +3,8 @@ package fun.sast.evento.lark.infrastructure.response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
-import lombok.AllArgsConstructor;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,16 +18,22 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.Objects;
 
-
-@AllArgsConstructor
 @RestControllerAdvice
 @SuppressWarnings("NullableProblems")
+@Slf4j
 public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
 
+    @Resource
     private ObjectMapper objectMapper;
 
     @ExceptionHandler(BusinessException.class)
     public GlobalResult<Object> business(BusinessException e) {
+        return GlobalResult.failure(e);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public GlobalResult<Object> runtime(RuntimeException e) {
+        log.error("Unexpected exception", e);
         return GlobalResult.failure(e);
     }
 
