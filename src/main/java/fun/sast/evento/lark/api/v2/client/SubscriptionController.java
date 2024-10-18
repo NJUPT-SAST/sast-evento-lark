@@ -4,6 +4,7 @@ import fun.sast.evento.lark.domain.event.service.SubscriptionService;
 import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
 import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import jakarta.annotation.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -42,7 +43,7 @@ class SubscriptionController {
         }
     }
 
-    @GetMapping("/subscription")
+    @GetMapping(value = "/subscription", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     Flux<ServerSentEvent<EventStateUpdateEvent>> subscription() {
         return subscriptionService.subscription(JWTInterceptor.userHolder.get().getUserId());
     }

@@ -10,9 +10,9 @@ public record GlobalResult<T>(boolean success, int errCode, String errMsg, T dat
         return new GlobalResult<>(true, 0, "", data);
     }
 
-    public static <T> GlobalResult<T> failure(BusinessException businessException) {
-        final var reason = businessException.error();
-        return new GlobalResult<>(false, reason.getCode(), reason.getMessage(), null);
+    public static <T> GlobalResult<T> failure(BusinessException exception) {
+        final var reason = exception.error();
+        return new GlobalResult<>(false, reason.getCode(), exception.getMessage(), null);
     }
 
     public static <T> GlobalResult<T> failure(HttpStatusCodeException httpStatusCodeException) {

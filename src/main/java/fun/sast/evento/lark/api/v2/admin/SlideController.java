@@ -20,7 +20,7 @@ class SlideController {
     @PostMapping("/{eventId}/slide")
     @CacheEvict(cacheNames = "slides", key = "#eventId")
     @RequirePermission(Permission.MANAGER)
-    public V2.Slide uploadSlide(@PathVariable Long eventId, @RequestParam MultipartFile file, @RequestParam String link) {
+    public V2.Slide uploadSlide(@PathVariable Long eventId, @RequestBody MultipartFile file, @RequestParam String link) {
         Slide slide = slideService.uploadSlide(eventId, file, link);
         return slideService.mapToV2Slide(slide);
     }
@@ -33,15 +33,15 @@ class SlideController {
     }
 
     @PostMapping("/slide")
-    @CacheEvict(cacheNames = "slides", key = "root")
+    @CacheEvict(cacheNames = "slides", key = "'root'")
     @RequirePermission(Permission.ADMIN)
-    public V2.Slide uploadSlide(@RequestParam MultipartFile file, @RequestParam String link) {
+    public V2.Slide uploadSlide(@RequestBody MultipartFile file, @RequestParam String link) {
         Slide slide = slideService.uploadSlide(file, link);
         return slideService.mapToV2Slide(slide);
     }
 
     @DeleteMapping("/slide/{slideId}")
-    @CacheEvict(cacheNames = "slides", key = "root")
+    @CacheEvict(cacheNames = "slides", key = "'root'")
     @RequirePermission(Permission.ADMIN)
     public Boolean deleteSlide(@PathVariable Long slideId) {
         return slideService.deleteSlide(slideId);

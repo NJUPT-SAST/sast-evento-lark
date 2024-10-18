@@ -17,5 +17,4 @@ public class BusinessException extends GlobalRuntimeException {
         super(message);
         this.error = ErrorEnum.DEFAULT;
     }
-
 }

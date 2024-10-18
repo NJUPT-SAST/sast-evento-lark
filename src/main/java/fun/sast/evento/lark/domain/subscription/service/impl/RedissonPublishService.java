@@ -1,6 +1,7 @@
 package fun.sast.evento.lark.domain.subscription.service.impl;
 
 import fun.sast.evento.lark.domain.subscription.service.PublishService;
+import jakarta.annotation.PreDestroy;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import reactor.core.publisher.Flux;
@@ -13,10 +14,11 @@ public abstract class RedissonPublishService<T> implements PublishService<T> {
     private final RTopic rTopic;
     private final AtomicReference<FluxSink<T>> sink = new AtomicReference<>();
     private final Flux<T> flux = Flux.create(sink::set).share();
+    private final int listenerId;
 
     protected RedissonPublishService(RedissonClient redissonClient, String topic) {
         rTopic = redissonClient.getTopic(topic);
-        rTopic.addListener(getClazz(), (entry, value) -> {
+        listenerId = rTopic.addListener(getClazz(), (entry, value) -> {
             var current = sink.get();
             if (current != null) {
                 current.next(value);
@@ -34,5 +36,14 @@ public abstract class RedissonPublishService<T> implements PublishService<T> {
     @Override
     public Flux<T> subscribe() {
         return flux;
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        FluxSink<T> currentSink = sink.getAndSet(null);
+        if (currentSink != null) {
+            currentSink.complete();
+        }
+        rTopic.removeListener(listenerId);
     }
 }

@@ -11,6 +11,6 @@ public class Slide {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     private Long eventId;
-    private String key;
-    private String link;
+    private String ossKey; // oss key
+    private String link; // click link
 }

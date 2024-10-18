@@ -1,8 +1,8 @@
 CREATE TABLE `attachment`
 (
-    `id`       BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `event_id` BIGINT(20)          NOT NULL,
-    `url`      VARCHAR(255)        NOT NULL,
+    `id`       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `event_id` BIGINT UNSIGNED NOT NULL,
+    `url`      VARCHAR(255)    NOT NULL,
     PRIMARY KEY (`id`)
 );
 CREATE TABLE `event`
@@ -14,7 +14,7 @@ CREATE TABLE `event`
     `end`                    DATETIME,
     `location`               VARCHAR(255),
     `tag`                    VARCHAR(255),
-    `lark_event_uid`         VARCHAR(255),
+    `lark_event_uid`         VARCHAR(64),
     `lark_meeting_room_name` VARCHAR(255),
     `lark_department_name`   VARCHAR(255),
     `cancelled`              BOOLEAN,
@@ -22,49 +22,48 @@ CREATE TABLE `event`
 );
 CREATE TABLE `feedback`
 (
-    `id`       BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `event_id` BIGINT(20)          NOT NULL,
-    `link_id`  VARCHAR(255)        NOT NULL,
+    `id`       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `event_id` BIGINT UNSIGNED NOT NULL,
+    `link_id`  VARCHAR(16)     NOT NULL,
     `rating`   INT,
     `content`  TEXT,
     PRIMARY KEY (`id`)
 );
 CREATE TABLE `subscription`
 (
-    `id`         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `event_id`   BIGINT(20)          NOT NULL,
-    `link_id`    VARCHAR(255)        NOT NULL,
-    `subscribed` BOOLEAN             NOT NULL,
-    `checked_in` BOOLEAN             NOT NULL,
+    `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `event_id`   BIGINT UNSIGNED NOT NULL,
+    `link_id`    VARCHAR(16)     NOT NULL,
+    `subscribed` BOOLEAN         NOT NULL,
+    `checked_in` BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (`id`)
 );
 CREATE TABLE `department_subscription`
 (
-    `id`            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `link_id`       VARCHAR(255)        NOT NULL,
-    `department_id` VARCHAR(20)         NOT NULL,
+    `id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `link_id`       VARCHAR(16)     NOT NULL,
+    `department_id` VARCHAR(64)     NOT NULL,
     PRIMARY KEY (`id`)
 );
 CREATE TABLE `slide`
 (
-    `id`       BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `event_id` BIGINT(20)          NOT NULL,
-    `url`      VARCHAR(255)        NOT NULL,
-    `link`     VARCHAR(255)        NOT NULL,
+    `id`       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `event_id` BIGINT UNSIGNED NOT NULL,
+    `oss_key`  VARCHAR(64)     NOT NULL,
+    `link`     VARCHAR(255)    NOT NULL,
     PRIMARY KEY (`id`)
 );
-
 CREATE TABLE `message`
 (
-    `id`       BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `event_id` BIGINT(20)          NOT NULL,
-    `state`    VARCHAR(255)        NOT NULL,
-    `time`     DATETIME            NOT NULL,
+    `id`       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `event_id` BIGINT UNSIGNED NOT NULL,
+    `state`    VARCHAR(16)     NOT NULL,
+    `time`     DATETIME        NOT NULL,
     PRIMARY KEY (`id`)
 );
-CREATE TABLE 'permission'
+CREATE TABLE `permission`
 (
-    'user_id'    VARCHAR(255) NOT NULL,
+    'user_id'    VARCHAR(16) NOT NULL,
     'permission' INT,
     PRIMARY KEY ('user_id')
 );

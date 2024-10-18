@@ -6,11 +6,13 @@ import fun.sast.evento.lark.domain.event.entity.Subscription;
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
 import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
 import fun.sast.evento.lark.domain.subscription.service.impl.EventStateUpdatePublishService;
-import fun.sast.evento.lark.infrastructure.cache.Cache;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.repository.DepartmentSubscriptionMapper;
 import fun.sast.evento.lark.infrastructure.repository.SubscriptionMapper;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -20,6 +22,7 @@ import java.util.Base64;
 import java.util.List;
 
 @Service
+@Slf4j
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Resource
@@ -27,7 +30,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Resource
     private DepartmentSubscriptionMapper departmentSubscriptionMapper;
     @Resource
-    private Cache cache;
+    private CacheManager cacheManager;
     @Resource
     private EventStateUpdatePublishService eventStateUpdatePublishService;
 
@@ -37,13 +40,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         byte[] bytes = new byte[5];
         random.nextBytes(bytes);
         String code = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).substring(0, 5);
-        cache.set("CHECKIN_CODE:" + code, eventId.toString()); // TODO: Expire time?
+        Cache cache = cacheManager.getCache("checkin-code");
+        if (cache == null) {
+            log.error("Cache not found.");
+            return null;
+        }
+        cache.put(code, eventId.toString());
         return code;
     }
 
     @Override
     public Boolean checkIn(Long eventId, String linkId, String code) {
-        String matchedId = cache.get("CHECKIN_CODE:" + code, String.class);
+        Cache cache = cacheManager.getCache("checkin-code");
+        if (cache == null) {
+            return false;
+        }
+        String matchedId = cache.get(code, String.class);
         if (matchedId == null) {
             throw new BusinessException("checkin-code not exists or has expired.");
         }
@@ -156,6 +168,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public Flux<ServerSentEvent<EventStateUpdateEvent>> subscription(String linkId) {
         return eventStateUpdatePublishService.subscribe()
                 .filter(event -> isSubscribed(event.eventId(), linkId))
-                .map(event -> ServerSentEvent.builder(event).build());
+                .map(event -> ServerSentEvent.builder(event).build())
+                .doOnError(e -> log.error("Subscription error", e));
     }
 }

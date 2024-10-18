@@ -6,7 +6,6 @@ import fun.feellmoose.service.SastLinkService;
 import fun.sast.evento.lark.domain.event.entity.User;
 import fun.sast.evento.lark.domain.event.service.UserService;
 import fun.sast.evento.lark.infrastructure.auth.JWTService;
-import fun.sast.evento.lark.infrastructure.cache.Cache;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,6 @@ class LoginController {
 
     SastLinkService sastLinkService;
     UserService userService;
-    Cache cache;
     JWTService jwtService;
 
     record Login(String token, User user) {
@@ -31,7 +29,6 @@ class LoginController {
         AccessToken accessToken = sastLinkService.accessToken(code);
         UserInfo userInfo = sastLinkService.user(accessToken.getAccessToken());
         User user = userService.getUser(userInfo);
-        cache.set(user.getUserId(), user);
         String token = jwtService.generate(new JWTService.Payload<>(user));
         return new Login(token, user);
     }

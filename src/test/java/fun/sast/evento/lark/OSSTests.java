@@ -24,4 +24,9 @@ public class OSSTests {
         log.info("delete success.");
     }
 
+    @Test
+    void remove(){
+        oss.delete("516519b4-7976-476f-9bdb-85b40da0b45");
+    }
+
 }

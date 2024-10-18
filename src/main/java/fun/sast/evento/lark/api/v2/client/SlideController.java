@@ -20,7 +20,7 @@ class SlideController {
     SlideService slideService;
 
     @GetMapping("/slide")
-    @Cacheable(cacheNames = "slides", key = "root")
+    @Cacheable(cacheNames = "slides", key = "'root'")
     public List<V2.Slide> getSlides() {
         List<Slide> slides = slideService.getSlides();
         return slides.stream().map(slideService::mapToV2Slide).toList();

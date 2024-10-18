@@ -6,11 +6,10 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ErrorEnum {
-    DEFAULT(1000, ""),
-    PARAM_ERROR(1001, "Parameter error"),
-    LARK_ERROR(1002, "Lark error"),
-    WEBSOCKET_ERROR(1003, "WebSocket error"),
+    DEFAULT(1000),
+    PARAM_ERROR(1001),
+    LARK_ERROR(1002),
+    SSE_ERROR(1003),
     ;
     private final int code;
-    private final String message;
 }

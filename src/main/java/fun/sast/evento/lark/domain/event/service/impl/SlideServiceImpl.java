@@ -33,7 +33,7 @@ public class SlideServiceImpl implements SlideService {
         String key = oss.upload(file);
         Slide slide = new Slide();
         slide.setEventId(eventId);
-        slide.setKey(key);
+        slide.setOssKey(key);
         slide.setLink(link);
         slideMapper.insert(slide);
         return slide;
@@ -48,7 +48,7 @@ public class SlideServiceImpl implements SlideService {
         if (!slide.getEventId().equals(eventId)) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "Unexpected slide.");
         }
-        oss.delete(slide.getKey());
+        oss.delete(slide.getOssKey());
         return slideMapper.deleteById(slideId) > 0;
     }
 
@@ -56,7 +56,8 @@ public class SlideServiceImpl implements SlideService {
     public Slide uploadSlide(MultipartFile file, String link) {
         String key = oss.upload(file);
         Slide slide = new Slide();
-        slide.setKey(key);
+        slide.setEventId(0L);
+        slide.setOssKey(key);
         slide.setLink(link);
         slideMapper.insert(slide);
         return slide;
@@ -68,14 +69,14 @@ public class SlideServiceImpl implements SlideService {
         if (slide == null) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "Slide not found");
         }
-        oss.delete(slide.getKey());
+        oss.delete(slide.getOssKey());
         return slideMapper.deleteById(slideId) > 0;
     }
 
     @Override
     public List<Slide> getSlides() {
         QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("event_id", null);
+        queryWrapper.eq("event_id", 0L);
         return slideMapper.selectList(queryWrapper);
     }
 
@@ -91,7 +92,7 @@ public class SlideServiceImpl implements SlideService {
         return new V2.Slide(
                 slide.getId(),
                 slide.getEventId().toString(),
-                oss.url(slide.getKey()).toString(),
+                oss.url(slide.getOssKey()).toString(),
                 slide.getLink()
         );
     }

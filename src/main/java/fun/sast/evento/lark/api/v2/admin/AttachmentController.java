@@ -20,7 +20,7 @@ class AttachmentController {
     @PostMapping("/{eventId}/attachment")
     @CacheEvict(cacheNames = "attachments", key = "#eventId")
     @RequirePermission(Permission.MANAGER)
-    public V2.Attachment uploadAttachment(@PathVariable Long eventId, @RequestParam MultipartFile file) {
+    public V2.Attachment uploadAttachment(@PathVariable Long eventId, @RequestBody MultipartFile file) {
         Attachment attachment = attachmentService.uploadAttachment(eventId, file);
         return attachmentService.mapToV2(attachment);
     }
