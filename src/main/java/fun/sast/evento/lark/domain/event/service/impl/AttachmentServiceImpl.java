@@ -45,7 +45,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "Attachment not found");
         }
         if (!attachment.getEventId().equals(eventId)) {
-            throw new BusinessException(ErrorEnum.PARAM_ERROR, "Unexpected attachment.");
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "Unexpected attachment");
         }
         oss.delete(attachment.getKey());
         return attachmentMapper.deleteById(attachmentId) > 0;

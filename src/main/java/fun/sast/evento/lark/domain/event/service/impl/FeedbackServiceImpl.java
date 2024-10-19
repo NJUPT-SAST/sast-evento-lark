@@ -10,6 +10,7 @@ import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.service.FeedbackService;
 import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
+import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.FeedbackMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -35,15 +36,15 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public Feedback createFeedback(Long eventId, Integer rating, String content) {
         if (getFeedback(eventId) != null) {
-            throw new BusinessException("You have already given feedback for this event");
+            throw new BusinessException(ErrorEnum.FEEDBACK_ALREADY_GIVEN);
         }
         // check time
         Event event = eventService.get(eventId);
         if (event == null) {
-            throw new BusinessException("Event not found");
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "Event not found");
         }
         if (LocalDateTime.now().isBefore(event.getEnd())) {
-            throw new BusinessException("The event has not ended yet");
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "The event has not ended yet");
         }
         Feedback feedback = new Feedback();
         feedback.setEventId(eventId);

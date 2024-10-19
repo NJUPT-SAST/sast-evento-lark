@@ -46,7 +46,7 @@ public class SlideServiceImpl implements SlideService {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "Slide not found");
         }
         if (!slide.getEventId().equals(eventId)) {
-            throw new BusinessException(ErrorEnum.PARAM_ERROR, "Unexpected slide.");
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "Unexpected slide");
         }
         oss.delete(slide.getOssKey());
         return slideMapper.deleteById(slideId) > 0;

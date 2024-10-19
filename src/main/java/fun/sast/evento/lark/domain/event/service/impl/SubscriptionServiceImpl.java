@@ -58,10 +58,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
         String matchedId = cache.get(code, String.class);
         if (matchedId == null) {
-            throw new BusinessException(ErrorEnum.CHECKIN_CODE_NOT_EXISTS, "checkin-code not exists or has expired.");
+            throw new BusinessException(ErrorEnum.CHECKIN_CODE_NOT_EXISTS, "checkin-code not exists or has expired");
         }
         if (!matchedId.equals(eventId.toString())) {
-            throw new BusinessException(ErrorEnum.CHECKIN_CODE_NOT_EXISTS, "checkin-code not match.");
+            throw new BusinessException(ErrorEnum.CHECKIN_CODE_NOT_EXISTS, "checkin-code not match");
         }
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);

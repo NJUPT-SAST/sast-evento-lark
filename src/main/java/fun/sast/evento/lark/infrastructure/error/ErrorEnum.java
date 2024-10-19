@@ -22,6 +22,8 @@ public enum ErrorEnum {
     LARK_ERROR_LIST_DEPARTMENT(2010, "Failed to list department"),
     LARK_ERROR_GET_DEPARTMENT(2011, "Failed to get department"),
     LARK_ERROR_GET_DEPARTMENT_USER(2012, "Failed to get user list"),
+
+    FEEDBACK_ALREADY_GIVEN(3001, "You have already given feedback for this event"),
     ;
     private final int code;
     private final String message;

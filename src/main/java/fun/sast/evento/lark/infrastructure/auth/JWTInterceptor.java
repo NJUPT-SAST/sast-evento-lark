@@ -37,7 +37,7 @@ public class JWTInterceptor implements HandlerInterceptor {
         User user = jwtService.verify(token, new TypeReference<>() {
         });
         if (requireLogin(user.getUserId())) {
-            throw new BusinessException(ErrorEnum.AUTH_ERROR, "Token expired");
+            throw new BusinessException(ErrorEnum.AUTH_ERROR, "token expired");
         }
         userHolder.set(user);
         if (handler instanceof HandlerMethod method) {
@@ -59,12 +59,12 @@ public class JWTInterceptor implements HandlerInterceptor {
         try {
             Cache cache = cacheManager.getCache("user");
             if (cache == null) {
-                log.error("user cache not found.");
+                log.error("user cache not found");
                 return false;
             }
             return cache.get(userId) == null;
         } catch (RuntimeException exception) {
-            log.error("failed to check user token cache.", exception);
+            log.error("failed to check user token cache", exception);
             return false;
         }
     }
