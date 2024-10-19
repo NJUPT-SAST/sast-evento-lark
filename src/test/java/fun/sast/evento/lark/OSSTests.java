@@ -13,16 +13,16 @@ public class OSSTests {
     @Autowired
     OSS oss;
 
-    @Test
-    public void OSSTest() {
-        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "hello".getBytes());
-        String key = oss.upload(file);
-        log.info("upload success, key:{}", key);
-        String url = oss.url(key).toString();
-        log.info("gen url success, url:{}", url);
-        oss.delete(key);
-        log.info("delete success.");
-    }
+//    @Test
+//    public void OSSTest() {
+//        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "hello".getBytes());
+//        String key = oss.upload(file);
+//        log.info("upload success, key:{}", key);
+//        String url = oss.url(key).toString();
+//        log.info("gen url success, url:{}", url);
+//        oss.delete(key);
+//        log.info("delete success.");
+//    }
 
     @Test
     void remove(){

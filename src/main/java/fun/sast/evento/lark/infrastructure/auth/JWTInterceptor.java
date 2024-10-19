@@ -63,7 +63,7 @@ public class JWTInterceptor implements HandlerInterceptor {
             }
             return cache.get(userId) == null;
         } catch (RuntimeException exception) {
-            log.error("failed to check user token cache.");
+            log.error("failed to check user token cache.", exception);
             return false;
         }
     }

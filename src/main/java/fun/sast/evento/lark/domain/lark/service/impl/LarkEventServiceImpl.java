@@ -52,18 +52,11 @@ public class LarkEventServiceImpl implements LarkEventService {
             "resource"：Room
             "third_party"：Email
              */
-            List<String> users = larkDepartmentServiceImpl.getUserList(create.departmentId());
             List<CalendarEventAttendee> attendeeList = new ArrayList<>();
             attendeeList.add(CalendarEventAttendee.newBuilder()
                     .type("resource")
                     .roomId(create.roomId())
                     .build());
-            for (String user : users) {
-                attendeeList.add(CalendarEventAttendee.newBuilder()
-                        .type("user")
-                        .userId(user)
-                        .build());
-            }
             CalendarEventAttendee[] attendees = attendeeList.toArray(new CalendarEventAttendee[0]);
             CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
                     .calendarId(calendarId)

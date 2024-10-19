@@ -162,8 +162,8 @@ public class EventServiceImpl implements EventService {
         Page<Event> page = new Page<>(current, size);
         QueryWrapper<Event> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(query.id() != null, "id", query.id());
-        queryWrapper.like(query.summary() != null, "summary", query.summary());
-        queryWrapper.like(query.description() != null, "description", query.description());
+        queryWrapper.like(query.summary() != null && !query.summary().isEmpty(), "summary", query.summary());
+        queryWrapper.like(query.description() != null && !query.description().isEmpty(), "description", query.description());
         LocalDateTime now = LocalDateTime.now();
         if (Boolean.TRUE.equals(query.active())) {
             queryWrapper.le("start", now);
@@ -172,10 +172,10 @@ public class EventServiceImpl implements EventService {
             queryWrapper.ge(query.start() != null, "start", query.start());
             queryWrapper.le(query.end() != null, "end", query.end());
         }
-        queryWrapper.eq(query.location() != null, "location", query.location());
-        queryWrapper.eq(query.tag() != null, "tag", query.tag());
-        queryWrapper.eq(query.larkMeetingRoomName() != null, "lark_meeting_room_name", query.larkMeetingRoomName());
-        queryWrapper.eq(query.larkDepartmentName() != null, "lark_department_name", query.larkDepartmentName());
+        queryWrapper.eq(query.location() != null && !query.location().isEmpty(), "location", query.location());
+        queryWrapper.eq(query.tag() != null && !query.tag().isEmpty(), "tag", query.tag());
+        queryWrapper.eq(query.larkMeetingRoomName() != null && !query.larkMeetingRoomName().isEmpty(), "lark_meeting_room_name", query.larkMeetingRoomName());
+        queryWrapper.eq(query.larkDepartmentName() != null && !query.larkDepartmentName().isEmpty(), "lark_department_name", query.larkDepartmentName());
         queryWrapper.exists(Boolean.TRUE.equals(query.participated()),
                 "SELECT 1 FROM subscription WHERE subscription.event_id = event.id AND subscription.link_id = " +
                         JWTInterceptor.userHolder.get().getUserId() +
