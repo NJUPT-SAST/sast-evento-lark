@@ -52,23 +52,25 @@ public class LarkEventServiceImpl implements LarkEventService {
             "resource"：Room
             "third_party"：Email
              */
-            List<CalendarEventAttendee> attendeeList = new ArrayList<>();
-            attendeeList.add(CalendarEventAttendee.newBuilder()
-                    .type("resource")
-                    .roomId(create.roomId())
-                    .build());
-            CalendarEventAttendee[] attendees = attendeeList.toArray(new CalendarEventAttendee[0]);
-            CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
-                    .calendarId(calendarId)
-                    .eventId(id)
-                    .createCalendarEventAttendeeReqBody(CreateCalendarEventAttendeeReqBody.newBuilder()
-                            .attendees(attendees)
-                            .build())
-                    .build());
-            if (!createCalendarEventAttendeeResp.success()) {
-                delete(id);
-                log.error("failed to create event attendee: {}", createCalendarEventAttendeeResp.getMsg());
-                throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
+            if (create.roomId() != null) {
+                List<CalendarEventAttendee> attendeeList = new ArrayList<>();
+                attendeeList.add(CalendarEventAttendee.newBuilder()
+                        .type("resource")
+                        .roomId(create.roomId())
+                        .build());
+                CalendarEventAttendee[] attendees = attendeeList.toArray(new CalendarEventAttendee[0]);
+                CreateCalendarEventAttendeeResp createCalendarEventAttendeeResp = oApi.getClient().calendar().calendarEventAttendee().create(CreateCalendarEventAttendeeReq.newBuilder()
+                        .calendarId(calendarId)
+                        .eventId(id)
+                        .createCalendarEventAttendeeReqBody(CreateCalendarEventAttendeeReqBody.newBuilder()
+                                .attendees(attendees)
+                                .build())
+                        .build());
+                if (!createCalendarEventAttendeeResp.success()) {
+                    delete(id);
+                    log.error("failed to create event attendee: {}", createCalendarEventAttendeeResp.getMsg());
+                    throw new BusinessException(ErrorEnum.LARK_ERROR, createCalendarEventAttendeeResp.getMsg());
+                }
             }
 
             return id;

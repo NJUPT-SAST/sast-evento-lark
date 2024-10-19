@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 
+import java.time.LocalDateTime;
+
 @SpringBootTest
 public class UserTest {
 

@@ -49,6 +49,16 @@ public class EventServiceImpl implements EventService {
         if (create.larkMeetingRoomId() != null && !larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
+        if (create.larkDepartmentId() == null) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "department id cannot be null");
+        }
+        String larkMeetingRoomName = create.larkMeetingRoomId() == null ? null : larkRoomService.get(create.larkMeetingRoomId()).name();
+        String larkDepartmentName = larkDepartmentService.get(create.larkDepartmentId()).name();
+        LocalDateTime start = create.start();
+        LocalDateTime end = create.end();
+        if (start.isAfter(end)) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
+        }
         String larkEventUid = larkEventService.create(new LarkEventCreate(
                 create.summary(),
                 create.description(),
@@ -63,13 +73,6 @@ public class EventServiceImpl implements EventService {
                 create.larkMeetingRoomId(),
                 create.larkDepartmentId()
         ));
-        String larkMeetingRoomName = create.larkMeetingRoomId() == null ? null : larkRoomService.get(create.larkMeetingRoomId()).name();
-        String larkDepartmentName = larkDepartmentService.get(create.larkDepartmentId()).name();
-        LocalDateTime start = create.start();
-        LocalDateTime end = create.end();
-        if (start.isAfter(end)) {
-            throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
-        }
         Event event = new Event();
         event.setSummary(create.summary());
         event.setDescription(create.description());
@@ -89,11 +92,18 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event update(Long eventId, EventUpdate update) {
-        if (update.larkMeetingRoomId() != null && !larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
+        Event event = eventMapper.selectById(eventId);
+        if (event == null) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "event not found");
+        }
+        // if room == null -> remove room
+        // if room != null && room != old room -> update room
+        String larkMeetingRoomName = update.larkMeetingRoomId() == null ? null : larkRoomService.get(update.larkMeetingRoomId()).name();
+        if (update.larkMeetingRoomId() != null &&
+                !larkMeetingRoomName.equals(event.getLarkMeetingRoomName()) &&
+                !larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
-        Event event = eventMapper.selectById(eventId);
-        String larkMeetingRoomName = update.larkMeetingRoomId() == null ? null : larkRoomService.get(update.larkMeetingRoomId()).name();
         LocalDateTime start = update.start() == null ? event.getStart() : update.start();
         LocalDateTime end = update.end() == null ? event.getEnd() : update.end();
         if (start.isAfter(end)) {

@@ -1,5 +1,9 @@
 package fun.sast.evento.lark;
 
+import com.lark.oapi.service.calendar.v4.model.DeleteCalendarEventReq;
+import com.lark.oapi.service.calendar.v4.model.DeleteCalendarEventResp;
+import com.lark.oapi.service.calendar.v4.model.ListCalendarEventReq;
+import com.lark.oapi.service.calendar.v4.model.ListCalendarEventResp;
 import fun.sast.evento.lark.domain.event.entity.User;
 import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
@@ -7,13 +11,16 @@ import fun.sast.evento.lark.domain.event.value.EventCreate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
 import fun.sast.evento.lark.domain.lark.service.impl.LarkDepartmentServiceImpl;
+import fun.sast.evento.lark.domain.lark.service.impl.LarkEventServiceImpl;
 import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.auth.JWTService;
+import fun.sast.evento.lark.infrastructure.lark.OApi;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @SpringBootTest
 public class EventServiceTest {
@@ -28,67 +35,90 @@ public class EventServiceTest {
     JWTService jwtService;
     @Autowired
     SubscriptionService subscriptionService;
+    @Autowired
+    LarkEventServiceImpl larkEventServiceImpl;
+    @Autowired
+    OApi oApi;
 
-//    @Test
-//    void createTestEvent(){
-//        eventService.create(new EventCreate(
-//                "this is a test event",
-//                "test description",
-//                LocalDateTime.now().plusDays(1),
-//                LocalDateTime.now().plusDays(1).plusHours(2),
-//                "test location",
-//                "tag",
-//                "omm_203fe8e78aa4a73f9de528b87d6c32d1",
-//                "od-64e02d30d83fe3d587e91d25da1fab95"
-//        ));
-//    }
-//
-//    @Test
-//    void deleteTestEvent(){
-//        eventService.delete(1846897410146017281L);
-//    }
-//
-//    @Test
-//    void queryEvent(){
-//        eventService.query(new EventQuery(
-//                null,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null,
-//                true,
-//                null
-//        ), 1, 1).elements().forEach(System.out::println);
-//    }
-//
-//    @Test
-//    void print(){
-//        larkDepartmentService.list().forEach(System.out::println);
-//        larkRoomService.list().forEach(System.out::println);
-//    }
-//
-//    @Test
-//    void subscribe() {
-//        User user = new User();
-//        user.setUserId("123");
-//        user.setPermission(0);
-//        JWTInterceptor.userHolder.set(user);
-//        System.out.println(jwtService.generate(new JWTService.Payload<>(user)));
-//
-//        subscriptionService.subscribeEvent(1847132458277367809L, "123", true);
-//    }
-//
-//    @Test
-//    void admin() {
-//        User user = new User();
-//        user.setUserId("B23051508");
-//        user.setPermission(2);
-//        JWTInterceptor.userHolder.set(user);
-//        System.out.println(jwtService.generate(new JWTService.Payload<>(user)));
-//    }
+    @Test
+    void createTestEvent() {
+        eventService.create(new EventCreate(
+                "this is a test event",
+                "test description",
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(2),
+                "test location",
+                "tag",
+                "omm_203fe8e78aa4a73f9de528b87d6c32d1",
+                "od-64e02d30d83fe3d587e91d25da1fab95"
+        ));
+    }
+
+    @Test
+    void deleteTestEvent() {
+        eventService.delete(1846897410146017281L);
+    }
+
+    @Test
+    void queryEvent() {
+        eventService.query(new EventQuery(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                true,
+                null
+        ), 1, 1).elements().forEach(System.out::println);
+    }
+
+    @Test
+    void print() {
+        larkDepartmentService.list().forEach(System.out::println);
+        larkRoomService.list().forEach(System.out::println);
+    }
+
+    @Test
+    void getEvents() throws Exception {
+        ListCalendarEventResp resp = oApi.getClient().calendar().calendarEvent().list(ListCalendarEventReq.newBuilder().calendarId(
+                "feishu.cn_bOA0EzgBzXUmNI0QuGCqoe@group.calendar.feishu.cn"
+        ).build());
+        Arrays.stream(resp.getData().getItems()).forEach(
+                event -> {
+                    System.out.println(event.getEventId());
+                    System.out.println(event.getSummary());
+                    try {
+                        DeleteCalendarEventResp resp1 = oApi.getClient().calendar().calendarEvent().delete(DeleteCalendarEventReq.newBuilder()
+                                .calendarId("feishu.cn_bOA0EzgBzXUmNI0QuGCqoe@group.calendar.feishu.cn").eventId(event.getEventId()).build());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+    }
+
+    @Test
+    void subscribe() {
+        User user = new User();
+        user.setUserId("123");
+        user.setPermission(0);
+        JWTInterceptor.userHolder.set(user);
+        System.out.println(jwtService.generate(new JWTService.Payload<>(user)));
+
+        subscriptionService.subscribeEvent(1847132458277367809L, "123", true);
+    }
+
+    @Test
+    void admin() {
+        User user = new User();
+        user.setUserId("B23051508");
+        user.setPermission(2);
+        JWTInterceptor.userHolder.set(user);
+        System.out.println(jwtService.generate(new JWTService.Payload<>(user)));
+    }
 }
