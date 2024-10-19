@@ -46,7 +46,7 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                         .build());
                 if (!resp.success()) {
                     log.error("failed to list room: {}", resp.getMsg());
-                    throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
+                    throw new BusinessException(ErrorEnum.LARK_ERROR_LIST_ROOM, resp.getMsg());
                 }
                 if (resp.getData().getRooms() != null) {
                     Arrays.stream(resp.getData().getRooms()).forEach(room -> larkRooms.add(new LarkRoom(
@@ -60,8 +60,8 @@ public class LarkRoomServiceImpl implements LarkRoomService {
             } while (hasMore);
             return larkRooms;
         } catch (Exception e) {
-            log.error("list room error", e);
-            throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
+            log.error("list room error: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -73,7 +73,7 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                     .build());
             if (!resp.success()) {
                 log.error("failed to get room: {}", resp.getMsg());
-                throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
+                throw new BusinessException(ErrorEnum.LARK_ERROR_GET_ROOM, resp.getMsg());
             }
             return new LarkRoom(
                     resp.getData().getRoom().getRoomId(),
@@ -81,8 +81,8 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                     resp.getData().getRoom().getCapacity()
             );
         } catch (Exception e) {
-            log.error("get room error", e);
-            throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
+            log.error("get room error: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -104,12 +104,12 @@ public class LarkRoomServiceImpl implements LarkRoomService {
                 return node.get("data").get("free_busy").isEmpty();
             } else {
                 log.error("failed to check room availability: {}", msg);
-                throw new BusinessException(ErrorEnum.LARK_ERROR, msg);
+                throw new BusinessException(ErrorEnum.LARK_ERROR_CHECK_ROOM_AVAILABLE, msg);
 
             }
         } catch (Exception e) {
-            log.error("check room availability error", e);
-            throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
+            log.error("check room availability error: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
