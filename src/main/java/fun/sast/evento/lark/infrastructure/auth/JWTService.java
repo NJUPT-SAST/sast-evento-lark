@@ -17,14 +17,12 @@ import java.util.Base64;
 public class JWTService {
     private final ObjectMapper objectMapper;
     private final Algorithm algorithm;
-    private final Long expire;
     private final JWTVerifier verifier;
 
-    public JWTService(@Value("${app.auth.jwt.secret}") String secret, @Value("${app.auth.jwt.expire}") Long expire, ObjectMapper objectMapper) {
+    public JWTService(@Value("${app.auth.jwt.secret}") String secret, ObjectMapper objectMapper) {
         this.algorithm = Algorithm.HMAC256(secret);
         this.verifier = JWT.require(algorithm).build();
         this.objectMapper = objectMapper;
-        this.expire = expire;
     }
 
     public record Payload<T>(T value) {

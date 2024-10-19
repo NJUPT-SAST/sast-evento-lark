@@ -1,8 +1,10 @@
 package fun.sast.evento.lark.api.value;
 
+import fun.feellmoose.model.Badge;
 import fun.sast.evento.lark.domain.common.value.EventState;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface V2 {
 
@@ -70,12 +72,23 @@ public interface V2 {
     ) {
     }
 
+    record Login(
+            String token,
+            User user
+    ){
+    }
+
     record User(
             String linkId,
             String email,
             String avatar,
-            String org,
-            String nickname
+            Badge badge,
+            String bio,
+            String dep,
+            List<String> hide,
+            List<String> link,
+            String nickname,
+            String org
     ) {
     }
 
