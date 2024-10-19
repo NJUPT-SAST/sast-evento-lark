@@ -76,9 +76,9 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
     }
 
     @Override
-    public List<String> getUserList(String openId) {
+    public List<V2.LarkUser> getUserList(String openId) {
         try {
-            List<String> users = new ArrayList<>();
+            List<V2.LarkUser> users = new ArrayList<>();
             String pageToken = null;
             boolean hasMore;
             do {
@@ -94,7 +94,14 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
                 pageToken = resp.getData().getPageToken();
                 hasMore = resp.getData().getHasMore();
                 if (resp.getData().getItems() != null) {
-                    Arrays.stream(resp.getData().getItems()).forEach(user -> users.add(user.getOpenId()));
+                    Arrays.stream(resp.getData().getItems()).forEach(user -> {
+                        AvatarInfo avatarInfo = user.getAvatar();
+                        users.add(new V2.LarkUser(
+                                user.getOpenId(),
+                                user.getName(),
+                                avatarInfo == null ? null : avatarInfo.getAvatar240()
+                        ));
+                    });
                 }
             } while (hasMore);
             return users;

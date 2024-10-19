@@ -10,6 +10,8 @@ import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController(value = "adminEventController")
 @RequestMapping("/api/v2/admin/event")
 class EventController {
@@ -62,5 +64,17 @@ class EventController {
     V2.Event cancelEvent(@PathVariable Long eventId) {
         Event event = eventService.cancel(eventId);
         return eventService.mapToV2(event);
+    }
+
+    @PostMapping("/{eventId}/invite")
+    @RequirePermission(Permission.MANAGER)
+    void invite(@PathVariable Long eventId, @RequestBody List<V2.LarkUser> users) {
+        eventService.invite(eventId, users);
+    }
+
+    @GetMapping("/{eventId}/invite")
+    @RequirePermission(Permission.MANAGER)
+    List<V2.LarkUser> invite(@PathVariable Long eventId) {
+        return eventService.getAttendees(eventId);
     }
 }

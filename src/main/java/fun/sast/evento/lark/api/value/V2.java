@@ -92,6 +92,13 @@ public interface V2 {
     ) {
     }
 
+    record LarkUser(
+            String openId,
+            String name,
+            String avatar
+    ){
+    }
+
     record Department(
             String id,
             String name

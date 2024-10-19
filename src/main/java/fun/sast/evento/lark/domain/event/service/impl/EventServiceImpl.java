@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lark.oapi.service.calendar.v4.model.TimeInfo;
 import fun.sast.evento.lark.api.value.V2;
+import fun.sast.evento.lark.domain.common.value.Constants;
 import fun.sast.evento.lark.domain.common.value.EventState;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Event;
@@ -27,6 +28,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -213,6 +215,30 @@ public class EventServiceImpl implements EventService {
         } else {
             return EventState.ACTIVE;
         }
+    }
+
+    @Override
+    public void invite(Long eventId, List<V2.LarkUser> users) {
+        Event event = eventMapper.selectById(eventId);
+        if (event == null) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "event not found");
+        }
+        larkEventService.invite(event.getLarkEventUid(), users);
+    }
+
+    @Override
+    public List<V2.LarkUser> getAttendees(Long eventId) {
+        Event event = eventMapper.selectById(eventId);
+        if (event == null) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "event not found");
+        }
+        return larkEventService.getAttendees(event.getLarkEventUid(), Constants.LARK_ATTENDEE_TYPE_USER)
+                .stream()
+                .map(attendee -> new V2.LarkUser(
+                        attendee.getUserId(),
+                        null,
+                        null))
+                .toList();
     }
 
     private void scheduleStateUpdate(Event event) {

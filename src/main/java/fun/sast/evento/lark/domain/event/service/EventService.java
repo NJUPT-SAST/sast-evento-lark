@@ -8,6 +8,8 @@ import fun.sast.evento.lark.domain.event.value.EventCreate;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import fun.sast.evento.lark.domain.event.value.EventUpdate;
 
+import java.util.List;
+
 public interface EventService {
     Event create(EventCreate create);
 
@@ -24,6 +26,10 @@ public interface EventService {
     Pagination<Event> query(EventQuery query, Integer current, Integer size);
 
     EventState calculateState(Event event);
+
+    void invite(Long eventId, List<V2.LarkUser> users);
+
+    List<V2.LarkUser> getAttendees(Long eventId);
 
     V2.Event mapToV2(Event event);
 }

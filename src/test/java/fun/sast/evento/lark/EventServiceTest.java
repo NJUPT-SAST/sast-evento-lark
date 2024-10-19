@@ -1,9 +1,7 @@
 package fun.sast.evento.lark;
 
-import com.lark.oapi.service.calendar.v4.model.DeleteCalendarEventReq;
-import com.lark.oapi.service.calendar.v4.model.DeleteCalendarEventResp;
-import com.lark.oapi.service.calendar.v4.model.ListCalendarEventReq;
-import com.lark.oapi.service.calendar.v4.model.ListCalendarEventResp;
+import com.lark.oapi.service.contact.v3.model.FindByDepartmentUserReq;
+import com.lark.oapi.service.contact.v3.model.FindByDepartmentUserResp;
 import fun.sast.evento.lark.domain.event.entity.User;
 import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.service.SubscriptionService;
@@ -85,21 +83,6 @@ public class EventServiceTest {
 
     @Test
     void getEvents() throws Exception {
-        ListCalendarEventResp resp = oApi.getClient().calendar().calendarEvent().list(ListCalendarEventReq.newBuilder().calendarId(
-                "feishu.cn_bOA0EzgBzXUmNI0QuGCqoe@group.calendar.feishu.cn"
-        ).build());
-        Arrays.stream(resp.getData().getItems()).forEach(
-                event -> {
-                    System.out.println(event.getEventId());
-                    System.out.println(event.getSummary());
-                    try {
-                        DeleteCalendarEventResp resp1 = oApi.getClient().calendar().calendarEvent().delete(DeleteCalendarEventReq.newBuilder()
-                                .calendarId("feishu.cn_bOA0EzgBzXUmNI0QuGCqoe@group.calendar.feishu.cn").eventId(event.getEventId()).build());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
     }
 
     @Test

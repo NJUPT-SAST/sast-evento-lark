@@ -25,17 +25,17 @@ CREATE TABLE `feedback`
     `id`       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `event_id` BIGINT UNSIGNED NOT NULL,
     `link_id`  VARCHAR(16)     NOT NULL,
-    `rating`   INT,
+    `rating`   INT             NOT NULL,
     `content`  TEXT,
     PRIMARY KEY (`id`)
 );
 CREATE TABLE `subscription`
 (
-    `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `event_id`   BIGINT UNSIGNED NOT NULL,
-    `link_id`    VARCHAR(16)     NOT NULL,
-    `subscribed` BOOLEAN         NOT NULL,
-    `checked_in` BOOLEAN DEFAULT FALSE,
+    `id`         BIGINT UNSIGNED       NOT NULL AUTO_INCREMENT,
+    `event_id`   BIGINT UNSIGNED       NOT NULL,
+    `link_id`    VARCHAR(16)           NOT NULL,
+    `subscribed` BOOLEAN DEFAULT FALSE NOT NULL,
+    `checked_in` BOOLEAN DEFAULT FALSE NOT NULL,
     PRIMARY KEY (`id`)
 );
 CREATE TABLE `department_subscription`

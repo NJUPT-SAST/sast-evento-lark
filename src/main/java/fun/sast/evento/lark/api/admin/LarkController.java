@@ -44,4 +44,10 @@ class LarkController {
     public Boolean isAvailable(@PathVariable String roomId, @RequestParam LocalDateTime start, @RequestParam LocalDateTime end) {
         return larkRoomService.isAvailable(roomId, start, end);
     }
+
+    @GetMapping("/department/{departmentId}/user")
+    @RequirePermission(Permission.MANAGER)
+    public List<V2.LarkUser> getUsersByDepartment(@PathVariable String departmentId) {
+        return larkDepartmentService.getUserList(departmentId);
+    }
 }
