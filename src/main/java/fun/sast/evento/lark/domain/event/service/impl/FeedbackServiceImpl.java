@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.common.value.Pagination;
+import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.entity.Feedback;
+import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.service.FeedbackService;
 import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
@@ -12,11 +14,15 @@ import fun.sast.evento.lark.infrastructure.repository.FeedbackMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class FeedbackServiceImpl implements FeedbackService {
 
     @Resource
     private FeedbackMapper feedbackMapper;
+    @Resource
+    private EventService eventService;
 
     @Override
     public Feedback getFeedback(Long eventId) {
@@ -30,6 +36,14 @@ public class FeedbackServiceImpl implements FeedbackService {
     public Feedback createFeedback(Long eventId, Integer rating, String content) {
         if (getFeedback(eventId) != null) {
             throw new BusinessException("You have already given feedback for this event");
+        }
+        // check time
+        Event event = eventService.get(eventId);
+        if (event == null) {
+            throw new BusinessException("Event not found");
+        }
+        if (LocalDateTime.now().isBefore(event.getEnd())) {
+            throw new BusinessException("The event has not ended yet");
         }
         Feedback feedback = new Feedback();
         feedback.setEventId(eventId);

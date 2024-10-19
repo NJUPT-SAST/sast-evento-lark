@@ -13,8 +13,8 @@ public class BusinessException extends GlobalRuntimeException {
         this.error = error;
     }
 
-    public BusinessException(String message) {
-        super(message);
-        this.error = ErrorEnum.DEFAULT;
+    public BusinessException(ErrorEnum error) {
+        super(error.getMessage());
+        this.error = error;
     }
 }

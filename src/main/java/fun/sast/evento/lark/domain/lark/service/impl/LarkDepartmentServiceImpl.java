@@ -37,7 +37,7 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
                         .build());
                 if (!resp.success()) {
                     log.error("failed to list department: {}", resp.getMsg());
-                    throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
+                    throw new BusinessException(ErrorEnum.LARK_ERROR_LIST_DEPARTMENT, resp.getMsg());
                 }
                 if (resp.getData().getItems() != null) {
                     Arrays.stream(resp.getData().getItems()).forEach(department -> larkDepartments.add(new LarkDepartment(
@@ -50,8 +50,8 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
             } while (hasMore);
             return larkDepartments;
         } catch (Exception e) {
-            log.error("list department error", e);
-            throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
+            log.error("list department error: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -63,15 +63,15 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
                     .build());
             if (!resp.success()) {
                 log.error("failed to get department: {}", resp.getMsg());
-                throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
+                throw new BusinessException(ErrorEnum.LARK_ERROR_GET_DEPARTMENT, resp.getMsg());
             }
             return new LarkDepartment(
                     resp.getData().getDepartment().getOpenDepartmentId(),
                     resp.getData().getDepartment().getName()
             );
         } catch (Exception e) {
-            log.error("get department error", e);
-            throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
+            log.error("get department error: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -89,7 +89,7 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
                         .build());
                 if (!resp.success()) {
                     log.error("failed to get user list of department: {}", resp.getMsg());
-                    throw new BusinessException(ErrorEnum.LARK_ERROR, resp.getMsg());
+                    throw new BusinessException(ErrorEnum.LARK_ERROR_GET_DEPARTMENT_USER, resp.getMsg());
                 }
                 pageToken = resp.getData().getPageToken();
                 hasMore = resp.getData().getHasMore();
@@ -107,7 +107,7 @@ public class LarkDepartmentServiceImpl implements LarkDepartmentService {
             return users;
         } catch (Exception e) {
             log.error("get user list of department error", e);
-            throw new BusinessException(ErrorEnum.LARK_ERROR, e.getMessage());
+            throw new RuntimeException( e.getMessage(), e);
         }
     }
 

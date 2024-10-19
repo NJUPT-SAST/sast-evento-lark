@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import fun.sast.evento.lark.api.security.RequirePermission;
 import fun.sast.evento.lark.domain.event.entity.User;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
+import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,13 +31,13 @@ public class JWTInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
-            throw new BusinessException("Please login first.");
+            throw new BusinessException(ErrorEnum.AUTH_ERROR, "Please login first");
         }
         String token = header.substring(7);
         User user = jwtService.verify(token, new TypeReference<>() {
         });
         if (requireLogin(user.getUserId())) {
-            throw new BusinessException("Please login first.");
+            throw new BusinessException(ErrorEnum.AUTH_ERROR, "Token expired");
         }
         userHolder.set(user);
         if (handler instanceof HandlerMethod method) {
@@ -48,7 +49,7 @@ public class JWTInterceptor implements HandlerInterceptor {
                 return true;
             }
             if (user.getPermission() < annotation.value().getNum()) {
-                throw new BusinessException("Permission denied");
+                throw new BusinessException(ErrorEnum.PERMISSION_DENIED);
             }
         }
         return true;

@@ -7,6 +7,7 @@ import fun.sast.evento.lark.domain.event.service.SubscriptionService;
 import fun.sast.evento.lark.domain.subscription.event.EventStateUpdateEvent;
 import fun.sast.evento.lark.domain.subscription.service.impl.EventStateUpdatePublishService;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
+import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.DepartmentSubscriptionMapper;
 import fun.sast.evento.lark.infrastructure.repository.SubscriptionMapper;
 import jakarta.annotation.Resource;
@@ -42,8 +43,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         String code = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).substring(0, 5);
         Cache cache = cacheManager.getCache("checkin-code");
         if (cache == null) {
-            log.error("Cache not found.");
-            return null;
+            log.error("checkin-code cache not found");
+            throw new RuntimeException("checkin-code cache not found");
         }
         cache.put(code, eventId.toString());
         return code;
@@ -57,10 +58,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
         String matchedId = cache.get(code, String.class);
         if (matchedId == null) {
-            throw new BusinessException("checkin-code not exists or has expired.");
+            throw new BusinessException(ErrorEnum.CHECKIN_CODE_NOT_EXISTS, "checkin-code not exists or has expired.");
         }
         if (!matchedId.equals(eventId.toString())) {
-            throw new BusinessException("checkin-code not match.");
+            throw new BusinessException(ErrorEnum.CHECKIN_CODE_NOT_EXISTS, "checkin-code not match.");
         }
         QueryWrapper<Subscription> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);

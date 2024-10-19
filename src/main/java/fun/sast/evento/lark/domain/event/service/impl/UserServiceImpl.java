@@ -43,8 +43,8 @@ public class UserServiceImpl implements UserService {
         String token = jwtService.generate(new JWTService.Payload<>(user));
         Cache cache = cacheManager.getCache("user");
         if (cache == null) {
-            log.error("user cache not found while logging in.");
-            throw new BusinessException("user cache not found.");
+            log.error("user cache not found while logging in");
+            throw new RuntimeException("user cache not found");
         }
         cache.put(user.getUserId(), token);
         return new V2.Login(token, mapToV2User(user));
@@ -58,8 +58,8 @@ public class UserServiceImpl implements UserService {
         userMapper.insertOrUpdate(user);
         Cache cache = cacheManager.getCache("user");
         if (cache == null) {
-            log.error("user cache not found while assigning role.");
-            throw new BusinessException("user cache not found.");
+            log.error("user cache not found while assigning role");
+            throw new RuntimeException("user cache not found");
         }
         cache.evictIfPresent(userId);
         return true;
