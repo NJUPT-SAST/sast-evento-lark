@@ -17,9 +17,6 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.time.Duration;
-import java.util.Map;
-
 @Configuration
 @EnableCaching
 @Slf4j
@@ -42,10 +39,6 @@ public class CacheConfig implements CachingConfigurer {
                 .prefixCacheNameWith(prefix + ":");
         return RedisCacheManager.builder(factory)
                 .cacheDefaults(configuration)
-                .withInitialCacheConfigurations(Map.of(
-                        "user", RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofDays(365))
-                ))
                 .build();
     }
 
