@@ -8,7 +8,7 @@
         <version>3.3.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.qingyou</groupId>
+    <groupId>fun.sast</groupId>
     <artifactId>sast-evento-lark</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>sast-evento-lark</name>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>fun.feellmoose</groupId>
             <artifactId>sast-link-sdk</artifactId>
-            <version>0.1.2</version>
+            <version>0.1.3</version>
         </dependency>
         <dependency>
             <groupId>com.larksuite.oapi</groupId>

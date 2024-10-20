@@ -8,7 +8,6 @@ import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.event.entity.User;
 import fun.sast.evento.lark.domain.event.service.UserService;
 import fun.sast.evento.lark.infrastructure.auth.JWTService;
-import fun.sast.evento.lark.infrastructure.error.BusinessException;
 import fun.sast.evento.lark.infrastructure.repository.UserMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,9 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     @Resource
-    private SastLinkService sastLinkService;
+    private SastLinkService sastLinkServiceWeb;
+    @Resource
+    private SastLinkService sastLinkServiceApp;
     @Resource
     private JWTService jwtService;
     @Resource
@@ -30,8 +31,9 @@ public class UserServiceImpl implements UserService {
     private CacheManager cacheManager;
 
     @Override
-    public V2.Login login(String code) {
-        AccessToken accessToken = sastLinkService.accessToken(code);
+    public V2.Login login(String code, Integer type, String codeVerifier) {
+        SastLinkService sastLinkService = type == 1 ? sastLinkServiceWeb : sastLinkServiceApp;
+        AccessToken accessToken = sastLinkService.accessToken(code, codeVerifier);
         UserInfo userInfo = sastLinkService.user(accessToken.getAccessToken());
         User user = userMapper.selectById(userInfo.getUserId());
         if (user == null) {

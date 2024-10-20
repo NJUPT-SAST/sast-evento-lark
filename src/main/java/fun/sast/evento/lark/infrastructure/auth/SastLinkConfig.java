@@ -10,18 +10,28 @@ import org.springframework.context.annotation.Configuration;
 class SastLinkConfig {
 
     @Bean
-    SastLinkService sastLinkService(@Value("${app.sast-link.client-id}") String id,
-                                    @Value("${app.sast-link.client-secret}") String secret,
-                                    @Value("${app.sast-link.code-verifier}") String verifier,
-                                    @Value("${app.sast-link.link-path}") String path,
-                                    @Value("${app.sast-link.redirect-uri}") String uri) {
+    SastLinkService sastLinkServiceWeb(@Value("${app.sast-link.link-path}") String path,
+                                       @Value("${app.sast-link.web-redirect-uri}") String uri,
+                                       @Value("${app.sast-link.web-client-id}") String id,
+                                       @Value("${app.sast-link.web-client-secret}") String secret) {
         return new HttpClientSastLinkService.Builder()
                 .setClientId(id)
                 .setClientSecret(secret)
-                .setCodeVerifier(verifier)
                 .setRedirectUri(uri)
                 .setHostName(path)
                 .build();
     }
 
+    @Bean
+    SastLinkService sastLinkServiceApp(@Value("${app.sast-link.link-path}") String path,
+                                       @Value("${app.sast-link.app-redirect-uri}") String uri,
+                                       @Value("${app.sast-link.app-client-id}") String id,
+                                       @Value("${app.sast-link.app-client-secret}") String secret) {
+        return new HttpClientSastLinkService.Builder()
+                .setClientId(id)
+                .setClientSecret(secret)
+                .setRedirectUri(uri)
+                .setHostName(path)
+                .build();
+    }
 }

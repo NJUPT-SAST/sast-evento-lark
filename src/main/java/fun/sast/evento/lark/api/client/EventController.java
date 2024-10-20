@@ -1,17 +1,17 @@
 package fun.sast.evento.lark.api.client;
 
+import fun.sast.evento.lark.api.security.Permission;
+import fun.sast.evento.lark.api.security.RequirePermission;
 import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.common.value.Pagination;
 import fun.sast.evento.lark.domain.event.entity.Event;
 import fun.sast.evento.lark.domain.event.service.EventService;
 import fun.sast.evento.lark.domain.event.value.EventQuery;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v2/client/event")
@@ -55,5 +55,14 @@ class EventController {
                 events.current(),
                 events.total()
         );
+    }
+
+    @GetMapping("/{eventId}/invite")
+    List<V2.LarkUser> getAttendees(@PathVariable Long eventId) {
+        return eventService.getAttendees(eventId).stream().map(user -> new V2.LarkUser(
+                null,
+                user.name(),
+                user.avatar()
+        )).toList();
     }
 }

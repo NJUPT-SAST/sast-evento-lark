@@ -5,7 +5,7 @@ import fun.sast.evento.lark.domain.event.entity.User;
 
 public interface UserService {
 
-    V2.Login login(String code);
+    V2.Login login(String code, Integer type, String codeVerifier);
 
     Boolean assignManagerRole(String userId);
 

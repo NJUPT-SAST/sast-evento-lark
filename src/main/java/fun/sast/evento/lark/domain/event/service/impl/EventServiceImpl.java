@@ -2,6 +2,7 @@ package fun.sast.evento.lark.domain.event.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lark.oapi.service.calendar.v4.model.CalendarEventAttendee;
 import com.lark.oapi.service.calendar.v4.model.TimeInfo;
 import fun.sast.evento.lark.api.value.V2;
 import fun.sast.evento.lark.domain.common.value.Constants;
@@ -16,8 +17,10 @@ import fun.sast.evento.lark.domain.event.value.EventUpdate;
 import fun.sast.evento.lark.domain.lark.service.LarkDepartmentService;
 import fun.sast.evento.lark.domain.lark.service.LarkEventService;
 import fun.sast.evento.lark.domain.lark.service.LarkRoomService;
+import fun.sast.evento.lark.domain.lark.service.LarkUserService;
 import fun.sast.evento.lark.domain.lark.value.LarkEventCreate;
 import fun.sast.evento.lark.domain.lark.value.LarkEventUpdate;
+import fun.sast.evento.lark.domain.lark.value.LarkUser;
 import fun.sast.evento.lark.domain.subscription.service.MessageService;
 import fun.sast.evento.lark.infrastructure.auth.JWTInterceptor;
 import fun.sast.evento.lark.infrastructure.error.BusinessException;
@@ -25,6 +28,7 @@ import fun.sast.evento.lark.infrastructure.error.ErrorEnum;
 import fun.sast.evento.lark.infrastructure.repository.EventMapper;
 import fun.sast.evento.lark.infrastructure.utils.TimeUtils;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -40,15 +44,19 @@ public class EventServiceImpl implements EventService {
     @Resource
     private LarkRoomService larkRoomService;
     @Resource
+    private LarkUserService larkUserService;
+    @Resource
     private SubscriptionService subscriptionService;
     @Resource
     private MessageService messageService;
     @Resource
     private EventMapper eventMapper;
+    @Value("${app.lark.check-room-availability}")
+    private Boolean checkRoomAvailability;
 
     @Override
     public Event create(EventCreate create) {
-        if (create.larkMeetingRoomId() != null && !larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
+        if (checkRoomAvailability && create.larkMeetingRoomId() != null && !larkRoomService.isAvailable(create.larkMeetingRoomId(), create.start(), create.end())) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
         if (create.larkDepartmentId() == null) {
@@ -100,16 +108,16 @@ public class EventServiceImpl implements EventService {
         }
         // if room == null -> remove room
         // if room != null && room != old room -> update room
-        String larkMeetingRoomName = update.larkMeetingRoomId() == null ? null : larkRoomService.get(update.larkMeetingRoomId()).name();
-        if (update.larkMeetingRoomId() != null &&
-                !larkMeetingRoomName.equals(event.getLarkMeetingRoomName()) &&
-                !larkRoomService.isAvailable(update.larkMeetingRoomId(), update.start(), update.end())) {
-            throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
-        }
         LocalDateTime start = update.start() == null ? event.getStart() : update.start();
         LocalDateTime end = update.end() == null ? event.getEnd() : update.end();
         if (start.isAfter(end)) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "start time should be before end time");
+        }
+        String larkMeetingRoomName = update.larkMeetingRoomId() == null ? null : larkRoomService.get(update.larkMeetingRoomId()).name();
+        if (checkRoomAvailability && update.larkMeetingRoomId() != null &&
+                !larkMeetingRoomName.equals(event.getLarkMeetingRoomName()) &&
+                !larkRoomService.isAvailable(update.larkMeetingRoomId(), start, end)) {
+            throw new BusinessException(ErrorEnum.PARAM_ERROR, "meeting room is not available");
         }
         larkEventService.update(event.getLarkEventUid(), new LarkEventUpdate(
                 update.summary(),
@@ -227,18 +235,15 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<V2.LarkUser> getAttendees(Long eventId) {
+    public List<LarkUser> getAttendees(Long eventId) {
         Event event = eventMapper.selectById(eventId);
         if (event == null) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "event not found");
         }
-        return larkEventService.getAttendees(event.getLarkEventUid(), Constants.LARK_ATTENDEE_TYPE_USER)
+        return larkUserService.list(larkEventService.getAttendees(event.getLarkEventUid(), Constants.LARK_ATTENDEE_TYPE_USER)
                 .stream()
-                .map(attendee -> new V2.LarkUser(
-                        attendee.getUserId(),
-                        null,
-                        null))
-                .toList();
+                .map(CalendarEventAttendee::getUserId)
+                .toList());
     }
 
     private void scheduleStateUpdate(Event event) {

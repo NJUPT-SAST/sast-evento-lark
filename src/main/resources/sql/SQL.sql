@@ -2,7 +2,7 @@ CREATE TABLE `attachment`
 (
     `id`       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `event_id` BIGINT UNSIGNED NOT NULL,
-    `url`      VARCHAR(255)    NOT NULL,
+    `oss_key`  VARCHAR(255)    NOT NULL,
     PRIMARY KEY (`id`)
 );
 CREATE TABLE `event`
@@ -61,7 +61,7 @@ CREATE TABLE `message`
     `time`     DATETIME        NOT NULL,
     PRIMARY KEY (`id`)
 );
-CREATE TABLE `permission`
+CREATE TABLE `user`
 (
     `user_id`    VARCHAR(16) NOT NULL,
     `permission` INT,

@@ -18,27 +18,27 @@ public class UserTest {
     @Autowired
     CacheManager cacheManager;
 
-    @Test
-    void generateUser(){
-        User user = new User();
-        user.setUserId("B00000000");
-        user.setPermission(Permission.LOGIN.getNum());
-
-        String token = jwtService.generate(new JWTService.Payload<>(user));
-        System.out.println(token);
-
-        cacheManager.getCache("user").put("B00000000", token);
-    }
-
-    @Test
-    void generateAdmin(){
-        User user = new User();
-        user.setUserId("B00000001");
-        user.setPermission(Permission.ADMIN.getNum());
-
-        String token = jwtService.generate(new JWTService.Payload<>(user));
-        System.out.println(token);
-
-        cacheManager.getCache("user").put("B00000001", token);
-    }
+//    @Test
+//    void generateUser(){
+//        User user = new User();
+//        user.setUserId("B00000000");
+//        user.setPermission(Permission.LOGIN.getNum());
+//
+//        String token = jwtService.generate(new JWTService.Payload<>(user));
+//        System.out.println(token);
+//
+//        cacheManager.getCache("user").put("B00000000", token);
+//    }
+//
+//    @Test
+//    void generateAdmin(){
+//        User user = new User();
+//        user.setUserId("B00000001");
+//        user.setPermission(Permission.ADMIN.getNum());
+//
+//        String token = jwtService.generate(new JWTService.Payload<>(user));
+//        System.out.println(token);
+//
+//        cacheManager.getCache("user").put("B00000001", token);
+//    }
 }

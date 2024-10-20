@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @TableName("user")
 public class User {
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "user_id", type = IdType.INPUT)
     private String userId;
     private Integer permission;
     @TableField(exist = false)

@@ -25,6 +25,7 @@ public enum ErrorEnum {
     LARK_ERROR_LIST_ROOM(2013, "Failed to list room"),
     LARK_ERROR_GET_ROOM(2014, "Failed to get room"),
     LARK_ERROR_CHECK_ROOM_AVAILABLE(2015, "Failed to check room available"),
+    LARK_ERROR_LIST_USER(2016, "Failed to list user"),
 
     FEEDBACK_ALREADY_GIVEN(3001, "You have already given feedback for this event"),
     ;

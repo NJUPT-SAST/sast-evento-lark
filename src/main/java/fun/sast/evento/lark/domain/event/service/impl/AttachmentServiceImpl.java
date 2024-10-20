@@ -33,7 +33,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         String key = oss.upload(file);
         Attachment attachment = new Attachment();
         attachment.setEventId(eventId);
-        attachment.setKey(key);
+        attachment.setOssKey(key);
         attachmentMapper.insert(attachment);
         return attachment;
     }
@@ -47,7 +47,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         if (!attachment.getEventId().equals(eventId)) {
             throw new BusinessException(ErrorEnum.PARAM_ERROR, "Unexpected attachment");
         }
-        oss.delete(attachment.getKey());
+        oss.delete(attachment.getOssKey());
         return attachmentMapper.deleteById(attachmentId) > 0;
     }
 
@@ -63,7 +63,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         return new V2.Attachment(
                 attachment.getId(),
                 attachment.getEventId().toString(),
-                oss.url(attachment.getKey()).toString()
+                oss.url(attachment.getOssKey()).toString()
         );
     }
 }

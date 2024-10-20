@@ -16,7 +16,7 @@ class LoginController {
     UserService userService;
 
     @PostMapping("/link")
-    V2.Login link(@RequestParam String code, @RequestParam Integer type) {
-        return userService.login(code);
+    V2.Login link(@RequestParam String code, @RequestParam Integer type, @RequestParam String codeVerifier) {
+        return userService.login(code, type, codeVerifier);
     }
 }

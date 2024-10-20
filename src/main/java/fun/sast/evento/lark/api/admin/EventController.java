@@ -74,7 +74,11 @@ class EventController {
 
     @GetMapping("/{eventId}/invite")
     @RequirePermission(Permission.MANAGER)
-    List<V2.LarkUser> invite(@PathVariable Long eventId) {
-        return eventService.getAttendees(eventId);
+    List<V2.LarkUser> getAttendees(@PathVariable Long eventId) {
+        return eventService.getAttendees(eventId).stream().map(user -> new V2.LarkUser(
+                user.openId(),
+                user.name(),
+                user.avatar()
+        )).toList();
     }
 }
