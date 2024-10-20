@@ -7,7 +7,9 @@ public interface UserService {
 
     V2.Login login(String code, Integer type, String codeVerifier);
 
-    Boolean assignManagerRole(String userId);
+    V2.Login refreshToken(String refreshToken);
 
-    V2.User mapToV2User(User user);
+    V2.User getProfile();
+
+    Boolean assignManagerRole(String userId);
 }

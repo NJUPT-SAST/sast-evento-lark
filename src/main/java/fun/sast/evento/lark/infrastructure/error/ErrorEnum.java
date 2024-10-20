@@ -7,9 +7,10 @@ import lombok.Getter;
 @Getter
 public enum ErrorEnum {
     AUTH_ERROR(1000, "Authentication error"),
-    PARAM_ERROR(1001, "Parameter error"),
-    PERMISSION_DENIED(1002, "Permission denied"),
-    CHECKIN_CODE_NOT_EXISTS(1003, "Checkin code not exists or has expired"),
+    TOKEN_EXPIRED(1001, "Token expired"),
+    PARAM_ERROR(1002, "Parameter error"),
+    PERMISSION_DENIED(1003, "Permission denied"),
+    CHECKIN_CODE_NOT_EXISTS(1004, "Checkin code not exists or has expired"),
     LARK_ERROR_CREATE_CALENDAR_EVENT(2001, "Failed to create event"),
     LARK_ERROR_SET_ROOM(2002, "Failed to set room"),
     LARK_ERROR_GET_EVENT(2003, "Failed to get event"),

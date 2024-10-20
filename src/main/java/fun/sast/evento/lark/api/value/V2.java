@@ -73,8 +73,13 @@ public interface V2 {
     }
 
     record Login(
-            String token,
-            User user
+            String accessToken,
+            String refreshToken
+    ){
+    }
+
+    record RefreshToken(
+            String refreshToken
     ){
     }
 

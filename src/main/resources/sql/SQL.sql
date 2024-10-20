@@ -63,7 +63,8 @@ CREATE TABLE `message`
 );
 CREATE TABLE `user`
 (
-    `user_id`    VARCHAR(16) NOT NULL,
-    `permission` INT,
+    `user_id`       VARCHAR(16)  NOT NULL,
+    `permission`    INT          NOT NULL,
+    `refresh_token` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`user_id`)
 );

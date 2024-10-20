@@ -9,8 +9,6 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -24,8 +22,6 @@ public class JWTInterceptor implements HandlerInterceptor {
     public static ThreadLocal<User> userHolder = new ThreadLocal<>();
     @Resource
     private JWTService jwtService;
-    @Resource
-    private CacheManager cacheManager;
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
@@ -36,9 +32,6 @@ public class JWTInterceptor implements HandlerInterceptor {
         String token = header.substring(7);
         User user = jwtService.verify(token, new TypeReference<>() {
         });
-        if (requireLogin(user.getUserId())) {
-            throw new BusinessException(ErrorEnum.AUTH_ERROR, "token expired");
-        }
         userHolder.set(user);
         if (handler instanceof HandlerMethod method) {
             if (!method.hasMethodAnnotation(RequirePermission.class)) {
@@ -53,20 +46,6 @@ public class JWTInterceptor implements HandlerInterceptor {
             }
         }
         return true;
-    }
-
-    private boolean requireLogin(String userId) {
-        try {
-            Cache cache = cacheManager.getCache("user");
-            if (cache == null) {
-                log.error("user cache not found");
-                return false;
-            }
-            return cache.get(userId) == null;
-        } catch (RuntimeException exception) {
-            log.error("failed to check user token cache", exception);
-            return false;
-        }
     }
 
     @Override
