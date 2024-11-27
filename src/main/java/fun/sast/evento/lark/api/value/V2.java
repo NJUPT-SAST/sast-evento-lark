@@ -93,7 +93,8 @@ public interface V2 {
             List<String> hide,
             List<String> link,
             String nickname,
-            String org
+            String org,
+            Integer permission
     ) {
     }
 

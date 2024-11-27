@@ -36,7 +36,9 @@ public class JWTService {
 
     @SneakyThrows
     public String generate(Payload<?> payload, long expire) {
-        return JWT.create().withPayload(objectMapper.writeValueAsString(payload))
+        return JWT.create()
+                .withPayload(objectMapper.writeValueAsString(payload))
+                .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(expire, ChronoUnit.MINUTES))
                 .sign(algorithm);
     }

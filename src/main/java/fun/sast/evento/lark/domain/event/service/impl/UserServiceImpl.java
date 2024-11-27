@@ -79,7 +79,8 @@ public class UserServiceImpl implements UserService {
                     userInfo.getHide(),
                     userInfo.getLink(),
                     userInfo.getNickname(),
-                    userInfo.getOrg()
+                    userInfo.getOrg(),
+                    user.getPermission()
             );
         } catch (Exception e) {
             throw new BusinessException(ErrorEnum.TOKEN_EXPIRED);
